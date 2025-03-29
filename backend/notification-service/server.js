@@ -7,10 +7,8 @@ const morgan = require('morgan');
 const connectDB = require('./config/db');
 const errorHandler = require('./middleware/error');
 
-// Load env vars
-dotenv.config();
 
-// Connect to database
+dotenv.config();
 connectDB();
 
 // Route files
