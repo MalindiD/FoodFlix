@@ -18,12 +18,17 @@ app.use(
 app.use(express.json());
 
 mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    serverSelectionTimeoutMS: 5000, // Timeout after 5 seconds
-    socketTimeoutMS: 45000 // Close sockets after 45 seconds of inactivity
-  })
+  // .connect(process.env.MONGO_URI, {
+  .connect(
+    process.env.MONGO_URI ||
+      "mongodb+srv://y3s2projectgroup:JuQT6yqnVdZ6FQ97@foodflix.j0p0p.mongodb.net/",
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 50000, // Timeout after 5 seconds
+      socketTimeoutMS: 60000 // Close sockets after 45 seconds of inactivity
+    }
+  )
   .then(() => {
     console.log("Connected to MongoDB successfully");
     console.log("Connection URI:", process.env.MONGO_URI);
@@ -36,7 +41,7 @@ mongoose
 // Routes
 app.use("/api/restaurants", restaurantRoutes);
 app.use("/api/restaurants/:restaurantId/menu-items", menuItemRoutes);
-app.use("/api/orders", orderRoutes);
+app.use("/api/restaurants/:restaurantId/orders", orderRoutes);
 
 // Basic error handling
 app.use((err, req, res, next) => {

@@ -4,7 +4,9 @@ const Restaurant = require("../../models/restaurant/Restaurant");
 // Create a new order
 exports.createOrder = async (req, res) => {
   try {
-    const { restaurantId, customerId, items, specialInstructions } = req.body;
+    // Get restaurantId from URL params or request body
+    const restaurantId = req.params.restaurantId || req.body.restaurantId;
+    const { customerId, items, specialInstructions } = req.body;
 
     // Validate restaurant exists
     const restaurant = await Restaurant.findById(restaurantId);
@@ -42,7 +44,16 @@ exports.createOrder = async (req, res) => {
 // Get order by ID
 exports.getOrderById = async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id)
+    const { id } = req.params;
+    const restaurantId = req.params.restaurantId;
+
+    // Include restaurantId in query if it's available in params
+    const query = { _id: id };
+    if (restaurantId) {
+      query.restaurantId = restaurantId;
+    }
+
+    const order = await Order.findOne(query)
       .populate("restaurantId", "name")
       .populate("items.menuItemId", "name");
 
@@ -63,6 +74,7 @@ exports.getOrderById = async (req, res) => {
 exports.updateOrderStatus = async (req, res) => {
   try {
     const { id } = req.params;
+    const restaurantId = req.params.restaurantId;
     const { status } = req.body;
 
     // Validate status
@@ -82,8 +94,14 @@ exports.updateOrderStatus = async (req, res) => {
       });
     }
 
-    const order = await Order.findByIdAndUpdate(
-      id,
+    // Include restaurantId in query if it's available in params
+    const query = { _id: id };
+    if (restaurantId) {
+      query.restaurantId = restaurantId;
+    }
+
+    const order = await Order.findOneAndUpdate(
+      query,
       {
         status,
         $push: {
@@ -115,21 +133,37 @@ exports.updateOrderStatus = async (req, res) => {
 // Get orders for a specific restaurant
 exports.getRestaurantOrders = async (req, res) => {
   try {
+    console.log("Request params:", req.params);
     const { restaurantId } = req.params;
     const { status } = req.query;
 
-    const query = { restaurantId };
-    if (status) {
-      query.status = status;
+    console.log("Restaurant ID:", restaurantId);
+    console.log("Status filter:", status);
+
+    if (!restaurantId) {
+      return res.status(400).json({ message: "Restaurant ID is required" });
     }
 
-    const orders = await Order.find(query)
-      .populate("customerId", "name")
-      .populate("items.menuItemId", "name")
-      .sort({ createdAt: -1 });
+    console.log("Attempting to find orders with query:", {
+      restaurantId,
+      status
+    });
 
-    res.status(200).json(orders);
+    try {
+      const orders = await Order.find({ restaurant: restaurantId });
+
+      console.log("Query result:", orders);
+
+      res.status(200).json(orders);
+    } catch (dbError) {
+      console.error("Database error:", dbError);
+      return res.status(500).json({
+        message: "Database error when fetching orders",
+        error: dbError.message
+      });
+    }
   } catch (error) {
+    console.error("Error in getRestaurantOrders:", error);
     res.status(500).json({
       message: "Error fetching restaurant orders",
       error: error.message
