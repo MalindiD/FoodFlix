@@ -2,42 +2,36 @@ const Order = require("../../models/Order");
 const Restaurant = require("../../models/restaurant/Restaurant");
 
 // Create a new order
+
 exports.createOrder = async (req, res) => {
   try {
-    // Get restaurantId from URL params or request body
-    const restaurantId = req.params.restaurantId || req.body.restaurantId;
-    const { customerId, items, specialInstructions } = req.body;
+    const { customerId, items, totalPrice, status, specialInstructions } =
+      req.body;
+    const { restaurantId } = req.params;
 
-    // Validate restaurant exists
-    const restaurant = await Restaurant.findById(restaurantId);
-    if (!restaurant) {
-      return res.status(404).json({ message: "Restaurant not found" });
+    if (!restaurantId) {
+      return res
+        .status(400)
+        .json({ message: "Restaurant ID is required in the URL" });
     }
 
-    // Calculate total price
-    const totalPrice = items.reduce(
-      (total, item) => total + item.price * item.quantity,
-      0
-    );
-
-    // Create order
-    const order = new Order({
-      restaurantId,
+    // Create the order with restaurant set from route param
+    const newOrder = new Order({
+      restaurant: restaurantId,
       customerId,
       items,
       totalPrice,
-      status: "Pending",
+      status,
       specialInstructions
     });
 
-    await order.save();
-
-    res.status(201).json(order);
+    await newOrder.save();
+    res.status(201).json(newOrder);
   } catch (error) {
-    res.status(400).json({
-      message: "Error creating order",
-      error: error.message
-    });
+    console.error("❌ Error creating order:", error);
+    res
+      .status(400)
+      .json({ message: "Error creating order", error: error.message });
   }
 };
 
@@ -72,8 +66,10 @@ exports.getOrderById = async (req, res) => {
 
 // Update order status (for restaurant)
 exports.updateOrderStatus = async (req, res) => {
+  console.log("📦 PATCH hit with:", req.params, req.body);
+
   try {
-    const { id } = req.params;
+    const { orderId } = req.params;
     const restaurantId = req.params.restaurantId;
     const { status } = req.body;
 
@@ -95,9 +91,9 @@ exports.updateOrderStatus = async (req, res) => {
     }
 
     // Include restaurantId in query if it's available in params
-    const query = { _id: id };
+    const query = { _id: orderId };
     if (restaurantId) {
-      query.restaurantId = restaurantId;
+      query.restaurant = restaurantId;
     }
 
     const order = await Order.findOneAndUpdate(
