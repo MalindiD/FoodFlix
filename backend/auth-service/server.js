@@ -17,17 +17,19 @@ const auth = require('./routes/auth');
 
 const app = express();
 
+// Simple CORS configuration
+app.use(cors({
+  origin: 'http://localhost:3001',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 // Body parser
 app.use(express.json());
 
 // Cookie parser
 app.use(cookieParser());
-
-// Enable CORS
-app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3000',
-  credentials: true
-}));
 
 // Dev logging middleware
 if (process.env.NODE_ENV === 'development') {

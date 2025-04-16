@@ -13,13 +13,18 @@ const {
   getUser,
   updateUser,
   deleteUser,
-  verifyUser
+  verifyUser,
+  firebaseLogin,
+  firebaseRegister  
 } = require('../controllers/auth');
 
 const { protect, authorize } = require('../middleware/auth');
 
+
 // Public routes
 router.post('/register', register);
+router.post('/firebase-login', firebaseLogin);
+router.post('/firebase-register', firebaseRegister);
 router.post('/login', login);
 router.get('/logout', logout);
 

@@ -1,18 +1,67 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import PaymentPage from './pages/PaymentPage';
+import React, { useContext } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+
+import Login from './pages/AuthService/Login';
+import Register from './pages/AuthService/Register';
+import LandingPage from './pages/Public/LandingPage';
+
+import CustomerDashboard from './pages/CustomerService/CustomerDashboard';
+// import DeliveryDashboard from './pages/DeliveryService/DeliveryDashboard';
+// import RestaurantDashboard from './pages/RestaurantService/RestaurantDashboard';
+// import AdminDashboard from './pages/AdminService/AdminDashboard';
+
+import AuthContext from './context/AuthContext';
+import { auth } from "./firebase";
+window.auth = auth;
+
 
 function App() {
+  const { user } = useContext(AuthContext);
+
   return (
-    <Router>
-      <div className="App">
-        <Routes>
-          <Route path="/payment" element={<PaymentPage />} />
-          {/* Add other routes as needed */}
-          <Route path="/" element={<div>Home Page</div>} />
-        </Routes>
-      </div>
-    </Router>
+    <Routes>
+      {/* Public Routes */}
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+
+      {/* Protected Role-Based Routes */}
+      {user?.role === 'customer' && (
+        <Route path="/dashboard" element={<CustomerDashboard />} />
+      )}
+
+      {/* {user?.role === 'delivery' && (
+        <Route path="/delivery-dashboard" element={<DeliveryDashboard />} />
+      )}
+
+      {user?.role === 'restaurant' && (
+        <Route path="/restaurant-dashboard" element={<RestaurantDashboard />} />
+      )}
+
+      {user?.role === 'admin' && (
+        <Route path="/admin" element={<AdminDashboard />} />
+      )} */}
+
+      {/* Catch-all Route */}
+      <Route
+        path="*"
+        element={
+          user ? (
+            <Navigate
+              to={
+                user.role === 'customer' ? '/dashboard' :
+                user.role === 'delivery' ? '/delivery-dashboard' :
+                user.role === 'restaurant' ? '/restaurant-dashboard' :
+                user.role === 'admin' ? '/admin' :
+                '/'
+              }
+            />
+          ) : (
+            <Navigate to="/login" />
+          )
+        }
+      />
+    </Routes>
   );
 }
 

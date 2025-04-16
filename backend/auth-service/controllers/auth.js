@@ -3,6 +3,76 @@ const User = require('../models/User');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../utils/async');
 const jwt = require('jsonwebtoken');
+const admin = require('../config/firebase');
+
+
+
+// @desc    Firebase Login
+// @route   POST /api/auth/firebase-login
+// @access  Public
+exports.firebaseLogin = asyncHandler(async (req, res, next) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ success: false, message: 'No token provided' });
+  }
+
+  const token = authHeader.split(' ')[1];
+
+  // 1. Verify Firebase token
+  const decoded = await admin.auth().verifyIdToken(token);
+  const { email, name, uid } = decoded;
+
+  // 2. Check if user exists in MongoDB
+  let user = await User.findOne({ email });
+
+  if (!user) {
+    // If not found, create a new user with Firebase info
+    user = await User.create({
+      name: name || "New User",
+      email,
+      password: Math.random().toString(36).slice(-8), // dummy password
+      role: "customer",
+      isVerified: true
+    });
+  }
+
+  // 3. Generate JWT from backend
+  sendTokenResponse(user, 200, res);
+});
+
+
+// @desc    Register user with Firebase
+// @route   POST /api/auth/firebase-register
+// @access  Public
+exports.firebaseRegister = asyncHandler(async (req, res, next) => {
+  const { name, email, role, phone, address, provider } = req.body;
+
+  // Verify if user already exists
+  let user = await User.findOne({ email });
+
+  if (user) {
+    // If user exists, return the user info
+    return res.status(200).json({
+      success: true,
+      data: user
+    });
+  }
+
+  // Create user if doesn't exist
+  user = await User.create({
+    name,
+    email,
+    password: Math.random().toString(36).slice(-8), // Random password as Firebase handles auth
+    role,
+    phone,
+    address,
+    isVerified: true // Firebase users are pre-verified
+  });
+  
+  // Create token
+  sendTokenResponse(user, 201, res);
+});
 
 // @desc    Register user
 // @route   POST /api/auth/register
