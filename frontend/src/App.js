@@ -9,7 +9,10 @@ import {
 import RestaurantManagementDashboard from "./restaurant-management/pages/Dashboard";
 import RestaurantsPage from "./restaurant-management/pages/RestaurantsPage";
 import MenuItemsPage from "./restaurant-management/pages/MenuItemsPage";
-import PaymentPage from "./pages/PaymentPage"; // ✅ from the first version
+import RestaurantLogin from "./restaurant-management/pages/RestaurantLogin";
+import RestaurantRegister from "./restaurant-management/pages/RestaurantRegister";
+
+import PaymentPage from "./pages/PaymentPage";
 
 function App() {
   return (
@@ -21,7 +24,15 @@ function App() {
             element={<Navigate to="/restaurant-management" replace />}
           />
           <Route
-            path="/restaurant-management"
+            path="/restaurant-management/login"
+            element={<RestaurantLogin />}
+          />
+          <Route
+            path="/restaurant-management/register"
+            element={<RestaurantRegister />}
+          />
+          <Route
+            path="/restaurant-management/dashboard"
             element={<RestaurantManagementDashboard />}
           />
           <Route
@@ -32,6 +43,7 @@ function App() {
             path="/restaurant-management/menu-items"
             element={<MenuItemsPage />}
           />
+
           <Route path="/payment" element={<PaymentPage />} />
         </Routes>
       </div>

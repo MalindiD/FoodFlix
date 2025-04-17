@@ -9,13 +9,19 @@ export const menuItemService = {
   createMenuItem: (restaurantId, menuItemData) =>
     axios.post(
       `${BASE_URL}/restaurants/${restaurantId}/menu-items`,
-      menuItemData
+      menuItemData,
+      {
+        headers: { "Content-Type": "multipart/form-data" }
+      }
     ),
 
   updateMenuItem: (restaurantId, menuItemId, menuItemData) =>
-    axios.put(
+    axios.patch(
       `${BASE_URL}/restaurants/${restaurantId}/menu-items/${menuItemId}`,
-      menuItemData
+      menuItemData,
+      {
+        headers: { "Content-Type": "multipart/form-data" }
+      }
     ),
 
   deleteMenuItem: (restaurantId, menuItemId) =>

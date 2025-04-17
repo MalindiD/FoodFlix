@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import { menuItemService } from "../../services/menuItemService";
+import axios from "axios";
 
 function MenuItemForm({ existingMenuItem = null, onClose, onSubmitSuccess }) {
-  // Mock restaurant ID - replace with actual ID from authentication
-  const MOCK_RESTAURANT_ID = "67e5a6f867431037543a038b";
+  const storedRestaurant = sessionStorage.getItem("restaurant");
+  const restaurantId = storedRestaurant
+    ? JSON.parse(storedRestaurant).id
+    : null;
 
   const [formData, setFormData] = useState(
     existingMenuItem
@@ -23,6 +26,12 @@ function MenuItemForm({ existingMenuItem = null, onClose, onSubmitSuccess }) {
         }
   );
 
+  const [imageFile, setImageFile] = useState(null);
+  const [imageUrl, setImageUrl] = useState("");
+  const [existingImage, setExistingImage] = useState(
+    existingMenuItem?.image || ""
+  );
+
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -38,34 +47,69 @@ function MenuItemForm({ existingMenuItem = null, onClose, onSubmitSuccess }) {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    // 🚫 Prevent base64 data URLs from being used
+    if (imageUrl && imageUrl.startsWith("data:image/")) {
+      setError("Base64-encoded images are not allowed in the Image URL field.");
+      setLoading(false);
+      return;
+    }
+
+    // ✅ Optional: Ensure only valid HTTP/HTTPS URLs are accepted
+    const isValidHttpUrl = (url) => {
+      try {
+        const u = new URL(url);
+        return u.protocol === "http:" || u.protocol === "https:";
+      } catch (_) {
+        return false;
+      }
+    };
+
+    if (imageUrl && !isValidHttpUrl(imageUrl)) {
+      setError(
+        "Please provide a valid image URL starting with http:// or https://"
+      );
+      setLoading(false);
+      return;
+    }
 
     try {
-      // Validate form data
       if (!formData.name || !formData.description || !formData.price) {
         setError("Please fill in all required fields");
         setLoading(false);
         return;
       }
 
-      // Convert price to number
-      const menuItemData = {
-        ...formData,
-        price: parseFloat(formData.price)
-      };
+      const form = new FormData();
+      Object.entries(formData).forEach(([key, value]) => {
+        form.append(key, value);
+      });
 
-      if (existingMenuItem) {
-        // Update existing menu item
-        await menuItemService.updateMenuItem(
-          MOCK_RESTAURANT_ID,
-          existingMenuItem._id,
-          menuItemData
-        );
-      } else {
-        // Create new menu item
-        await menuItemService.createMenuItem(MOCK_RESTAURANT_ID, menuItemData);
+      if (imageFile) {
+        form.append("image", imageFile); // File uploaded
+      } else if (imageUrl) {
+        form.append("imageUrl", imageUrl); // URL given
+      } else if (existingImage) {
+        form.append("existingImage", existingImage); // Preserve old image ✅
       }
 
-      // Success callback
+      if (existingMenuItem) {
+        await axios.patch(
+          `http://localhost:5000/api/restaurants/${restaurantId}/menu-items/${existingMenuItem._id}`,
+          form,
+          {
+            headers: { "Content-Type": "multipart/form-data" }
+          }
+        );
+      } else {
+        await axios.post(
+          `http://localhost:5000/api/restaurants/${restaurantId}/menu-items`,
+          form,
+          {
+            headers: { "Content-Type": "multipart/form-data" }
+          }
+        );
+      }
+
       onSubmitSuccess();
       onClose();
     } catch (error) {
@@ -77,21 +121,22 @@ function MenuItemForm({ existingMenuItem = null, onClose, onSubmitSuccess }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-      <div className="bg-white p-8 rounded-lg w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center overflow-auto z-50">
+      <div className="bg-white p-6 rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
+        <h2 className="text-2xl font-bold mb-4">
           {existingMenuItem ? "Edit Menu Item" : "Add New Menu Item"}
         </h2>
 
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Name */}
           <div>
-            <label className="block mb-2 font-semibold">Name</label>
+            <label className="block mb-1 font-semibold">Name</label>
             <input
               type="text"
               name="name"
@@ -99,56 +144,97 @@ function MenuItemForm({ existingMenuItem = null, onClose, onSubmitSuccess }) {
               onChange={handleInputChange}
               className="w-full border rounded p-2"
               required
-              placeholder="Enter menu item name"
             />
           </div>
 
+          {/* Description */}
           <div>
-            <label className="block mb-2 font-semibold">Description</label>
+            <label className="block mb-1 font-semibold">Description</label>
             <textarea
               name="description"
               value={formData.description}
               onChange={handleInputChange}
               className="w-full border rounded p-2"
               required
-              placeholder="Describe the menu item"
-              rows="3"
+              rows="2"
             />
           </div>
 
+          {/* Price & Category */}
+          <div className="flex gap-4">
+            <div className="w-1/2">
+              <label className="block mb-1 font-semibold">Price</label>
+              <input
+                type="number"
+                name="price"
+                value={formData.price}
+                onChange={handleInputChange}
+                className="w-full border rounded p-2"
+                required
+                min="0"
+                step="0.01"
+              />
+            </div>
+            <div className="w-1/2">
+              <label className="block mb-1 font-semibold">Category</label>
+              <select
+                name="category"
+                value={formData.category}
+                onChange={handleInputChange}
+                className="w-full border rounded p-2"
+                required
+              >
+                <option value="">Select</option>
+                <option value="Appetizer">Appetizer</option>
+                <option value="Main Course">Main Course</option>
+                <option value="Dessert">Dessert</option>
+                <option value="Beverage">Beverage</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Image Preview */}
+          {existingMenuItem?.image && (
+            <div>
+              <label className="block mb-1 font-semibold">Current Image</label>
+              <img
+                src={
+                  existingMenuItem.image.startsWith("http")
+                    ? existingMenuItem.image
+                    : `http://localhost:5000/${existingMenuItem.image}`
+                }
+                alt="Current"
+                className="w-24 h-24 object-cover rounded border mb-2"
+              />
+            </div>
+          )}
+
+          {/* Upload & URL Input */}
           <div>
-            <label className="block mb-2 font-semibold">Price</label>
+            <label className="block mb-1 font-semibold">Upload New Image</label>
             <input
-              type="number"
-              name="price"
-              value={formData.price}
-              onChange={handleInputChange}
+              type="file"
+              accept="image/*"
+              onChange={(e) => setImageFile(e.target.files[0])}
               className="w-full border rounded p-2"
-              required
-              min="0"
-              step="0.01"
-              placeholder="Enter price"
             />
           </div>
 
           <div>
-            <label className="block mb-2 font-semibold">Category</label>
-            <select
-              name="category"
-              value={formData.category}
-              onChange={handleInputChange}
+            <label className="block mb-1 font-semibold">
+              Or Paste Image URL
+            </label>
+            <input
+              type="text"
+              value={imageUrl}
+              onChange={(e) => setImageUrl(e.target.value)}
               className="w-full border rounded p-2"
-              required
-            >
-              <option value="">Select Category</option>
-              <option value="Appetizer">Appetizer</option>
-              <option value="Main Course">Main Course</option>
-              <option value="Dessert">Dessert</option>
-              <option value="Beverage">Beverage</option>
-            </select>
+              placeholder="https://example.com/image.jpg"
+            />
           </div>
 
-          <div className="flex items-center">
+          {/* Availability */}
+          <div className="flex items-center space-x-2">
             <input
               type="checkbox"
               name="isAvailable"
@@ -159,7 +245,8 @@ function MenuItemForm({ existingMenuItem = null, onClose, onSubmitSuccess }) {
             <label>Available</label>
           </div>
 
-          <div className="flex justify-end space-x-4 mt-6">
+          {/* Actions */}
+          <div className="flex justify-end space-x-4 pt-2">
             <button
               type="button"
               onClick={onClose}

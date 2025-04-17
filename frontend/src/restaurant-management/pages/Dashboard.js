@@ -2,14 +2,26 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import renderOrdersTable from "../components/orders/renderOrdersTable";
 import OrderDetailsModal from "../components/orders/OrderDetailsModal";
+import { useNavigate } from "react-router-dom";
 
 function Dashboard() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const navigate = useNavigate();
 
-  const restaurantId = "67e5a6f867431037543a038b";
+  const storedRestaurant = sessionStorage.getItem("restaurant");
+
+  const restaurantId = storedRestaurant
+    ? JSON.parse(storedRestaurant).id
+    : null;
+
+  useEffect(() => {
+    if (!restaurantId) {
+      navigate("/restaurant-management/login");
+    }
+  }, [restaurantId, navigate]);
 
   const pendingOrders = orders.filter(
     (order) => order.status?.toLowerCase() === "pending"

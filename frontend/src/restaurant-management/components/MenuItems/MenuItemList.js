@@ -9,29 +9,31 @@ function MenuItemList() {
   const [isAddFormOpen, setIsAddFormOpen] = useState(false);
   const [editingMenuItem, setEditingMenuItem] = useState(null);
 
-  // Mock restaurant ID - replace with actual ID from authentication
-  const MOCK_RESTAURANT_ID = "67e5a6f867431037543a038b";
+  const storedRestaurant = sessionStorage.getItem("restaurant");
+  const restaurantId = storedRestaurant
+    ? JSON.parse(storedRestaurant).id
+    : null;
 
   useEffect(() => {
-    fetchMenuItems();
-  }, []);
+    if (restaurantId) fetchMenuItems();
+  }, [restaurantId]);
 
   const fetchMenuItems = async () => {
     try {
       setLoading(true);
-      const response = await menuItemService.getMenuItems(MOCK_RESTAURANT_ID);
+      const response = await menuItemService.getMenuItems(restaurantId);
       setMenuItems(response.data);
-      setLoading(false);
     } catch (error) {
       console.error("Failed to fetch menu items", error);
       setError("Failed to load menu items");
+    } finally {
       setLoading(false);
     }
   };
 
   const handleDeleteMenuItem = async (menuItemId) => {
     try {
-      await menuItemService.deleteMenuItem(MOCK_RESTAURANT_ID, menuItemId);
+      await menuItemService.deleteMenuItem(restaurantId, menuItemId);
       fetchMenuItems();
     } catch (error) {
       console.error("Failed to delete menu item", error);
@@ -45,7 +47,7 @@ function MenuItemList() {
   ) => {
     try {
       await menuItemService.updateMenuItemAvailability(
-        MOCK_RESTAURANT_ID,
+        restaurantId,
         menuItemId,
         !currentAvailability
       );
@@ -71,25 +73,45 @@ function MenuItemList() {
               key={item._id}
               className="flex justify-between items-center border-b pb-4"
             >
-              <div>
-                <h3 className="text-lg font-semibold">{item.name}</h3>
-                <p className="text-gray-600">{item.description}</p>
-                <p className="text-gray-600">Price: ${item.price.toFixed(2)}</p>
-                <span
-                  className={`inline-block px-2 py-1 rounded text-sm ${
-                    item.isAvailable
-                      ? "bg-green-200 text-green-800"
-                      : "bg-red-200 text-red-800"
-                  }`}
-                >
-                  {item.isAvailable ? "Available" : "Unavailable"}
-                </span>
+              <div className="flex items-center space-x-4">
+                {/* Image preview */}
+                {item.image ? (
+                  <img
+                    src={
+                      item.image.startsWith("http")
+                        ? item.image // external URL
+                        : `http://localhost:5000/${item.image}` // uploaded file path
+                    }
+                    alt={item.name}
+                    className="w-20 h-20 object-cover rounded-md border"
+                  />
+                ) : (
+                  <div className="w-20 h-20 bg-gray-200 rounded-md flex items-center justify-center text-gray-400">
+                    No Image
+                  </div>
+                )}
+
+                <div>
+                  <h3 className="text-lg font-semibold">{item.name}</h3>
+                  <p className="text-gray-600">{item.description}</p>
+                  <p className="text-gray-600">
+                    Price: ${item.price.toFixed(2)}
+                  </p>
+                  <span
+                    className={`inline-block px-2 py-1 rounded text-sm ${
+                      item.isAvailable
+                        ? "bg-green-200 text-green-800"
+                        : "bg-red-200 text-red-800"
+                    }`}
+                  >
+                    {item.isAvailable ? "Available" : "Unavailable"}
+                  </span>
+                </div>
               </div>
+
               <div className="flex space-x-2">
                 <button
-                  onClick={() => {
-                    setEditingMenuItem(item);
-                  }}
+                  onClick={() => setEditingMenuItem(item)}
                   className="bg-blue-500 text-white px-3 py-1 rounded"
                 >
                   Edit
