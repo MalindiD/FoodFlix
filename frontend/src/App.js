@@ -4,16 +4,13 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/AuthService/Login';
 import Register from './pages/AuthService/Register';
 import LandingPage from './pages/Public/LandingPage';
-
+import CheckoutPage from './pages/CustomerService/CheckoutPage';
 import CustomerDashboard from './pages/CustomerService/CustomerDashboard';
 // import DeliveryDashboard from './pages/DeliveryService/DeliveryDashboard';
 // import RestaurantDashboard from './pages/RestaurantService/RestaurantDashboard';
 // import AdminDashboard from './pages/AdminService/AdminDashboard';
 
 import AuthContext from './context/AuthContext';
-import { auth } from "./firebase";
-window.auth = auth;
-
 
 function App() {
   const { user } = useContext(AuthContext);
@@ -27,7 +24,10 @@ function App() {
 
       {/* Protected Role-Based Routes */}
       {user?.role === 'customer' && (
-        <Route path="/dashboard" element={<CustomerDashboard />} />
+        <>
+          <Route path="/dashboard" element={<CustomerDashboard />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
+        </>
       )}
 
       {/* {user?.role === 'delivery' && (
