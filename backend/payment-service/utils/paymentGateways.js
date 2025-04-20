@@ -1,4 +1,6 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+console.log("Stripe Key:", process.env.STRIPE_SECRET_KEY);
+
 
 /**
  * Process payment through Stripe

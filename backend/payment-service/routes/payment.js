@@ -28,4 +28,16 @@ router.get('/order/:orderId', protect, getPaymentByOrderId);
 // Admin only routes
 router.get('/', protect, authorize('admin'), getPayments);
 
+// routes/payment.js - add this route for debugging
+router.get('/test-auth', protect, (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'Authentication successful',
+    user: {
+      id: req.user.id,
+      role: req.user.role
+    }
+  });
+});
+
 module.exports = router;

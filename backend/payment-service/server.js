@@ -30,9 +30,12 @@ if (process.env.NODE_ENV === 'development') {
 
 // Enable CORS
 app.use(cors({
-  origin: process.env.CLIENT_URL,
-  credentials: true
+  origin: true, // Reflect request origin - accepts requests from any origin
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
 
 // Raw body for Stripe webhook
 app.use((req, res, next) => {
@@ -69,3 +72,7 @@ process.on('unhandledRejection', (err) => {
   // Close server & exit process
   server.close(() => process.exit(1));
 });
+
+// Add this to server.js or app.js in BOTH services
+console.log('JWT Secret first 5 chars:', process.env.JWT_SECRET.substring(0, 5));
+console.log('[PAYMENT SERVICE] JWT_SECRET first 5:', process.env.JWT_SECRET?.substring(0, 5));
