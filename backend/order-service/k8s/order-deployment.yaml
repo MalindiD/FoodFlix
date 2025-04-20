@@ -17,10 +17,10 @@ spec:
         - name: order-service
           image: foodflix/order-service:latest
           ports:
-            - containerPort: 5002
+            - containerPort: 4000
           env:
             - name: PORT
-              value: "5002"
+              value: "4000"
             - name: DB_URI
               valueFrom:
                 secretKeyRef:
@@ -38,7 +38,7 @@ spec:
             - name: NOTIFICATION_SERVICE_URL
               value: "http://notification-service:5004"
             - name: AUTH_SERVICE_URL
-              value: "http://auth-service:5000"
+              value: "http://auth-service:3000"
             - name: RABBITMQ_URL
               value: "amqp://rabbitmq-service:5672"
           resources:
@@ -51,12 +51,12 @@ spec:
           livenessProbe:
             httpGet:
               path: /health
-              port: 5002
+              port: 4000
             initialDelaySeconds: 30
             periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /health
-              port: 5002
+              port: 4000
             initialDelaySeconds: 5
             periodSeconds: 5
