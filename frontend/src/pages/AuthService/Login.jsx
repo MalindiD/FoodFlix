@@ -1,7 +1,5 @@
 import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { auth } from '../../firebase'; // ✅ Firebase auth
-import { signInWithEmailAndPassword, getIdToken } from 'firebase/auth';
 import api from '../../api/axios';
 import AuthContext from '../../context/AuthContext';
 
@@ -23,21 +21,12 @@ export default function Login() {
     setError('');
 
     try {
-      // ✅ Firebase Sign In with Email/Password
-      const userCred = await signInWithEmailAndPassword(auth, formData.email, formData.password);
-
-      // ✅ Get Firebase Token
-      const token = await getIdToken(userCred.user);
-
-      // ✅ Send token to backend
-      const res = await api.post('/auth/firebase-login', {}, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      // ✅ Send email and password to your backend
+      const res = await api.post('/auth/login', formData, {
         withCredentials: true
       });
 
-      const { user, token: backendToken, message } = res.data;
+      const { user, token, message } = res.data;
 
       if (message) {
         setError(message);
@@ -45,9 +34,9 @@ export default function Login() {
         return;
       }
 
-      login(user, backendToken);
+      login(user, token);
 
-      // ✅ Redirect by role
+      // ✅ Redirect based on role
       if (user.role === 'customer') {
         navigate('/dashboard');
       } else if (user.role === 'delivery') {
@@ -61,7 +50,7 @@ export default function Login() {
       }
 
     } catch (err) {
-      console.error('❌ Firebase Login Error:', err.response?.data || err.message);
+      console.error('❌ Login Error:', err.response?.data || err.message);
       setError(err.response?.data?.message || 'Login failed');
     } finally {
       setLoading(false);
