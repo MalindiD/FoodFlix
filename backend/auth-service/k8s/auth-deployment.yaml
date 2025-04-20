@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: auth-service
-        image: foodflix/auth-service:latest
+        image: nuwanifonseka/auth-service:latest
         ports:
         - containerPort: 3000
         env:
@@ -32,7 +32,7 @@ spec:
         - name: JWT_SECRET
           valueFrom:
             secretKeyRef:
-              name: jwt-secret
+              name: mongodb-secret
               key: jwt-secret
         - name: JWT_EXPIRE
           value: "30d"

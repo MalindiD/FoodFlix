@@ -59,3 +59,6 @@ process.on('unhandledRejection', (err, promise) => {
   // Close server & exit process
   server.close(() => process.exit(1));
 });
+
+// Add this to server.js or app.js in BOTH services
+console.log('JWT Secret first 5 chars:', process.env.JWT_SECRET.substring(0, 5));
