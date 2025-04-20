@@ -1,5 +1,6 @@
 // src/components/Shared/Navbar.jsx
 import React, { useContext, useState, useEffect } from "react";
+import { Link } from 'react-router-dom';
 import {
   Menu,
   Search,
@@ -145,8 +146,9 @@ export default function Navbar() {
               <Heart className="h-5 w-5" /> Favorites
             </li>
             <li className="flex items-center gap-3 hover:text-[#ec5834] cursor-pointer">
-              <Wallet className="h-5 w-5" /> Wallet
-            </li>
+  <Wallet className="h-5 w-5" />
+  <Link to="/checkout">Wallet</Link>
+</li>
             <li className="flex items-center gap-3 hover:text-[#ec5834] cursor-pointer">
               <HelpCircle className="h-5 w-5" /> Help
             </li>
