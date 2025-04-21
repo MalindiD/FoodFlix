@@ -37,11 +37,25 @@ exports.createMenuItem = async (req, res) => {
   const imageFromFile = req.file ? req.file.path : "";
   const imageFromUrl = req.body.imageUrl || "";
 
+  // ✅ Parse tags field
+  let parsedTags = [];
+  try {
+    if (typeof req.body.tags === "string") {
+      parsedTags = JSON.parse(req.body.tags);
+    } else if (Array.isArray(req.body.tags)) {
+      parsedTags = req.body.tags;
+    }
+  } catch (err) {
+    console.error("Error parsing tags:", err);
+    return res.status(400).json({ message: "Invalid tags format" });
+  }
+
   try {
     const menuItem = new MenuItem({
       ...req.body,
       restaurantId: req.params.restaurantId,
-      image: imageFromFile || imageFromUrl // ✅ store whichever is provided
+      image: imageFromFile || imageFromUrl,
+      tags: parsedTags // ✅ use parsed tags array
     });
     await menuItem.save();
     res.status(201).json(menuItem);
@@ -53,28 +67,41 @@ exports.createMenuItem = async (req, res) => {
 };
 
 // Update menu item
-// Update menu item
 exports.updateMenuItem = async (req, res) => {
   const { id } = req.params;
 
   const imageFromFile = req.file ? req.file.path : "";
   const imageFromUrl = req.body.imageUrl || "";
   const existingImage = req.body.existingImage || "";
+  const finalImage = imageFromFile || imageFromUrl || existingImage;
 
-  const finalImage = imageFromFile || imageFromUrl || existingImage; // ✅ fallback logic
+  // ✅ Parse tags field
+  let parsedTags = [];
+  try {
+    if (typeof req.body.tags === "string") {
+      parsedTags = JSON.parse(req.body.tags);
+    } else if (Array.isArray(req.body.tags)) {
+      parsedTags = req.body.tags;
+    }
+  } catch (err) {
+    console.error("Error parsing tags:", err);
+    return res.status(400).json({ message: "Invalid tags format" });
+  }
 
   try {
     const updated = await MenuItem.findByIdAndUpdate(
       id,
       {
         ...req.body,
-        image: finalImage
+        image: finalImage,
+        tags: parsedTags // ✅ use parsed tags array
       },
       { new: true }
     );
 
-    if (!updated)
+    if (!updated) {
       return res.status(404).json({ message: "Menu item not found" });
+    }
 
     res.status(200).json(updated);
   } catch (error) {

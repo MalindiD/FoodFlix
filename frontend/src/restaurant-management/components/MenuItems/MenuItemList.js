@@ -97,6 +97,19 @@ function MenuItemList() {
                   <p className="text-gray-600">
                     Price: ${item.price.toFixed(2)}
                   </p>
+                  {item.tags && item.tags.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {item.tags.map((tag, index) => (
+                        <span
+                          key={index}
+                          className="bg-gray-200 text-sm px-2 py-1 rounded-full text-gray-700"
+                        >
+                          #{tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
                   <span
                     className={`inline-block px-2 py-1 rounded text-sm ${
                       item.isAvailable
