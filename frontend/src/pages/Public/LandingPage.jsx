@@ -117,8 +117,7 @@ export default function LandingPage() {
       desc: "Valid for first 2 orders until 30 April",
       img: "/images/kfc.jpg",
       cta: "Use Code: CB650",
-    },
-    {
+    },{
       title: "40% Off for New Users*",
       desc: "Valid on your first 2 orders above Rs. 1,000",
       img: "/images/pizza.jpg",
@@ -141,7 +140,7 @@ export default function LandingPage() {
       desc: "Valid for first 2 orders until 30 April",
       img: "/images/kfc.jpg",
       cta: "Use Code: CB650",
-    },
+    }
   ];
 
   return (
@@ -168,6 +167,7 @@ export default function LandingPage() {
         </div>
       </header>
 
+      {/* Location Picker Modal */}
       <LocationPickerModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
@@ -178,7 +178,7 @@ export default function LandingPage() {
         }}
       />
 
-      {/* Categories + Tags */}
+      {/* Category + Tags Scroll */}
       <section className="relative px-4 py-4">
         <button onClick={scrollLeft} className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-white shadow rounded-full p-1">
           <ChevronLeft className="h-5 w-5 text-[#ec5834]" />
@@ -247,6 +247,27 @@ export default function LandingPage() {
           ))}
         </div>
       </section>
+
+      {/* Sidebar */}
+      {sidebarOpen && (
+        <>
+          <div className="fixed inset-0 bg-black bg-opacity-40 z-40" onClick={() => setSidebarOpen(false)} />
+          <div className="fixed top-0 left-0 h-full w-72 bg-white shadow-xl z-50">
+            <div className="p-5 flex flex-col gap-6 text-sm text-gray-900">
+              <div className="flex justify-between items-center mb-2">
+                <h2 className="text-lg font-bold">Welcome</h2>
+                <button onClick={() => setSidebarOpen(false)} className="text-lg text-gray-500 font-bold">×</button>
+              </div>
+              <button onClick={() => { navigate("/register"); setSidebarOpen(false); }} className="w-full bg-black text-white py-2 rounded-lg font-semibold">Sign up</button>
+              <button onClick={() => { navigate("/login"); setSidebarOpen(false); }} className="w-full border border-gray-300 py-2 rounded-lg">Log in</button>
+              <div className="mt-2 space-y-3">
+                <p className="hover:text-[#ec5834] cursor-pointer flex items-center gap-2"><Utensils className="h-4 w-4" /> Add your restaurant</p>
+                <p className="hover:text-[#ec5834] cursor-pointer flex items-center gap-2"><Bike className="h-4 w-4" /> Sign up to deliver</p>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
