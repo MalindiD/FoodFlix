@@ -9,41 +9,60 @@ export default function CustomerDashboard() {
 
   const [restaurants, setRestaurants] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [tags, setTags] = useState([]); // ✅ New state
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const combinedItems = Array.from(new Set([...categories, ...tags]));
 
-  // Icon mapping with fallback
+
   const categoryIconMap = {
     Pizza: '🍕',
     Bakery: '🥐',
     Burgers: '🍔',
-    'Bubble Tea': '🧋',
-    'Fried Chicken': '🍗',
-    Noodles: '🍜',
-    Drinks: '🥤',
-    'Ice Cream': '🍦',
-    Coffee: '☕',
-    Chinese: '🥡',
-    Snacks: '🍪',
-    Indian: '🍛',
-    Soup: '🥣',
-    Korean: '🍲',
     Sushi: '🍣',
-    'Fast Food': '🍟',
-    Mexican: '🌮',
-    'Hot Dog': '🌭',
-    BBQ: '🍖',
-    Donuts: '🍩',
+    Pasta: '🍝',
+    Noodles: '🍜',
     Seafood: '🦞',
-    Salads: '🥬',
-    Vegan: '🥒',
-    Wraps: '🌯'
+    Soup: '🥣',
+    BBQ: '🍖',
+    Chicken: '🍗',
+    Beef: '🥩',
+    'Non-veg': '🍖',
+    Veg: '🥦',
+    Spicy: '🌶️',
+    Salad: '🥬',
+    Donuts: '🍩',
+    Wraps: '🌯',
+  
+    // 🍹 Beverages & Drinks
+    Beverages: '🥂',     // ✅ new
+    Drinks: '🥤',
+    Coffee: '☕',
+    'Bubble Tea': '🧋',
+    'Milkshake': '🥛',    // ✅ new
+  
+    // 🍨 Desserts
+    'Ice Cream': '🍦',
+  
+    // 🍽️ Cuisine Styles
+    Chinese: '🥡',
+    Indian: '🍛',
+    Korean: '🍲',
+    Mexican: '🌮',
+    'Fast Food': '🍟',
+    'Hot Dog': '🌭',
+  
+    // 🍱 General Categories
+    Snacks: '🍪',
+    'Main Course': '🍽️',  // ✅ new
+    Rice: '🍚'    
   };
-
+  
   useEffect(() => {
     fetchRestaurants();
-    fetchCategories(); // 👈 Load unique categories
+    fetchCategories(); // 👈 Categories
+    fetchTags();       // 👈 Tags
   }, []);
 
   useEffect(() => {
@@ -91,6 +110,15 @@ export default function CustomerDashboard() {
     }
   };
 
+  const fetchTags = async () => {
+    try {
+      const data = await restaurantService.getUniqueTags();
+      setTags(data || []);
+    } catch (err) {
+      console.error('Failed to fetch tags:', err);
+    }
+  };
+
   const handleCategorySelect = (category) => {
     setSelectedCategory(category === selectedCategory ? null : category);
   };
@@ -114,6 +142,18 @@ export default function CustomerDashboard() {
       desc: 'Valid for the first 2 orders until 30 April',
       img: '/images/kfc.jpg',
       cta: 'Use Code: CB650'
+    },
+    {
+      title: '40% Off for New Users*',
+      desc: 'Valid on your first 2 orders above Rs. 1,000',
+      img: '/images/pizza.jpg',
+      cta: 'Use Code: UBERSSL'
+    },
+    {
+      title: '65% Off with Commercial Bank',
+      desc: 'Valid for the first 2 orders until 30 April',
+      img: '/images/kfc.jpg',
+      cta: 'Use Code: CB650'
     }
   ];
 
@@ -123,27 +163,27 @@ export default function CustomerDashboard() {
 
       {/* Categories */}
       <section className="relative px-4 py-4">
-        <button onClick={scrollLeft} className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-white shadow rounded-full p-1">
-          <ChevronLeft className="h-5 w-5 text-[#ec5834]" />
-        </button>
-        <div ref={scrollRef} className="overflow-x-auto whitespace-nowrap scrollbar-hide flex space-x-4 px-6">
-          {categories.map((cat) => (
-            <div
-              key={cat}
-              className={`flex flex-col items-center text-sm min-w-fit cursor-pointer ${
-                selectedCategory === cat ? 'text-[#ec5834] font-bold' : 'text-gray-700'
-              }`}
-              onClick={() => handleCategorySelect(cat)}
-            >
-              <div className="text-2xl">{categoryIconMap[cat] || '🍽️'}</div>
-              <span>{cat}</span>
-            </div>
-          ))}
-        </div>
-        <button onClick={scrollRight} className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-white shadow rounded-full p-1">
-          <ChevronRight className="h-5 w-5 text-[#ec5834]" />
-        </button>
-      </section>
+  <button onClick={scrollLeft} className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-white shadow rounded-full p-1">
+    <ChevronLeft className="h-5 w-5 text-[#ec5834]" />
+  </button>
+  <div ref={scrollRef} className="overflow-x-auto whitespace-nowrap scrollbar-hide flex space-x-4 px-6">
+    {combinedItems.map((item) => (
+      <div
+        key={item}
+        className={`flex flex-col items-center text-sm min-w-fit cursor-pointer ${
+          selectedCategory === item ? 'text-[#ec5834] font-bold' : 'text-gray-700'
+        }`}
+        onClick={() => handleCategorySelect(item)}
+      >
+        <div className="text-2xl">{categoryIconMap[item] || '🍽️'}</div>
+        <span>{item}</span>
+      </div>
+    ))}
+  </div>
+  <button onClick={scrollRight} className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-white shadow rounded-full p-1">
+    <ChevronRight className="h-5 w-5 text-[#ec5834]" />
+  </button>
+</section>
 
       {/* Filters */}
       <section className="px-4 pb-4">
