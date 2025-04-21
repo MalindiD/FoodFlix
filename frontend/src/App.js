@@ -72,7 +72,7 @@ function App() {
               }
             />
           ) : (
-            <Navigate to="/login" />
+            <Navigate to="/" />
           )
         }
       />
