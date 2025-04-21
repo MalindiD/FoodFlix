@@ -90,8 +90,22 @@ const restaurantService = {
       console.error('Error fetching menu categories:', error);
       throw error;
     }
+  },
+
+  // ✅ Get unique tags
+  getUniqueTags: async () => {
+  try {
+    const response = await restaurantApi.get('/restaurants/menu-items/tags/unique');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching tags:', error);
+    throw error;
   }
+}
+
 };
+
+
 
 
 export default restaurantService;
