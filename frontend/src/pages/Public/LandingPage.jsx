@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import restaurantService from "../../api/restaurantService";
 import {
   Menu,
   Search,
@@ -6,7 +7,7 @@ import {
   ChevronRight,
   Utensils,
   Bike,
-  MapPin
+  MapPin,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import LocationPickerModal from "../../components/Shared/LocationPickerModal";
@@ -20,49 +21,87 @@ export default function LandingPage() {
   const [location, setLocation] = useState("141/6 Vauxhall St");
   const [modalOpen, setModalOpen] = useState(false);
 
+  const [restaurants, setRestaurants] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [tags, setTags] = useState([]);
+  const combinedItems = Array.from(new Set([...categories, ...tags]));
+
   useEffect(() => {
     const savedLocation = localStorage.getItem("userLocation");
-    if (savedLocation) {
-      setLocation(savedLocation);
-    }
+    if (savedLocation) setLocation(savedLocation);
+    fetchRestaurants();
+    fetchCategories();
+    fetchTags();
   }, []);
 
+  const fetchRestaurants = async () => {
+    try {
+      const data = await restaurantService.getAllRestaurants();
+      setRestaurants(data || []);
+    } catch (err) {
+      console.error("Failed to fetch restaurants:", err);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const data = await restaurantService.getUniqueMenuCategories();
+      setCategories(data || []);
+    } catch (err) {
+      console.error("Failed to fetch categories:", err);
+    }
+  };
+
+  const fetchTags = async () => {
+    try {
+      const data = await restaurantService.getUniqueTags();
+      setTags(data || []);
+    } catch (err) {
+      console.error("Failed to fetch tags:", err);
+    }
+  };
 
   const scrollLeft = () => scrollRef.current.scrollBy({ left: -300, behavior: "smooth" });
   const scrollRight = () => scrollRef.current.scrollBy({ left: 300, behavior: "smooth" });
   const scrollOfferLeft = () => offerScrollRef.current.scrollBy({ left: -300, behavior: "smooth" });
   const scrollOfferRight = () => offerScrollRef.current.scrollBy({ left: 300, behavior: "smooth" });
 
-
-  const categories = [
-    { name: "Pizza", icon: "🍕" },
-    { name: "Burgers", icon: "🍔" },
-    { name: "Bubble Tea", icon: "🧋" },
-    { name: "Indian", icon: "🍛" },
-    { name: "Chinese", icon: "🫑" },
-    { name: "Snacks", icon: "🍪" },
-    { name: "Noodles", icon: "🍜" },
-    { name: "Salads", icon: "🥬" },
-    { name: "Bubble Tea", icon: "🧋" },
-    { name: "Indian", icon: "🍛" },
-    { name: "Chinese", icon: "🫑" },
-    { name: "Snacks", icon: "🍪" },
-    { name: "Noodles", icon: "🍜" },
-    { name: "Salads", icon: "🥬" },
-    { name: "Bubble Tea", icon: "🧋" },
-    { name: "Indian", icon: "🍛" },
-    { name: "Chinese", icon: "🫑" },
-    { name: "Snacks", icon: "🍪" },
-    { name: "Noodles", icon: "🍜" },
-    { name: "Salads", icon: "🥬" },
-    { name: "Bubble Tea", icon: "🧋" },
-    { name: "Indian", icon: "🍛" },
-    { name: "Chinese", icon: "🫑" },
-    { name: "Snacks", icon: "🍪" },
-    { name: "Noodles", icon: "🍜" },
-    { name: "Salads", icon: "🥬" },
-    { name: "Seafood", icon: "🦞" }
-  ];
+  const categoryIconMap = {
+    Pizza: "🍕",
+    Bakery: "🥐",
+    Burgers: "🍔",
+    "Bubble Tea": "🧋",
+    "Fried Chicken": "🍗",
+    Noodles: "🍜",
+    Drinks: "🥤",
+    "Ice Cream": "🍦",
+    Coffee: "☕",
+    Chinese: "🥡",
+    Snacks: "🍪",
+    Indian: "🍛",
+    Soup: "🥣",
+    Korean: "🍲",
+    Sushi: "🍣",
+    "Fast Food": "🍟",
+    Mexican: "🌮",
+    "Hot Dog": "🌭",
+    BBQ: "🍖",
+    Donuts: "🍩",
+    Seafood: "🦞",
+    Salads: "🥬",
+    Vegan: "🥒",
+    Wraps: "🌯",
+    Chicken: "🍗",
+    Beef: "🥩",
+    "Non-veg": "🍖",
+    Veg: "🥦",
+    Spicy: "🌶️",
+    Rice: "🍚",
+    Beverages: "🥂",
+    "Main Course": "🍽️",
+    Milkshake: "🥛",
+    Pasta: "🍝"
+  };
 
   const filters = ["Offers", "Delivery fee", "Under 30 min", "Highest rated", "Rating", "Price", "Sort"];
 
@@ -80,81 +119,29 @@ export default function LandingPage() {
       cta: "Use Code: CB650",
     },
     {
-        title: "40% Off for New Users*",
-        desc: "Valid on your first 2 orders above Rs. 1,000",
-        img: "/images/pizza.jpg",
-        cta: "Use Code: UBERSSL",
-      },
-      {
-        title: "65% Off with Commercial Bank",
-        desc: "Valid for first 2 orders until 30 April",
-        img: "/images/kfc.jpg",
-        cta: "Use Code: CB650",
-      },
-      {
-        title: "40% Off for New Users*",
-        desc: "Valid on your first 2 orders above Rs. 1,000",
-        img: "/images/pizza.jpg",
-        cta: "Use Code: UBERSSL",
-      },
-      {
-        title: "65% Off with Commercial Bank",
-        desc: "Valid for first 2 orders until 30 April",
-        img: "/images/kfc.jpg",
-        cta: "Use Code: CB650",
-      },
-  ];
-
-  const stores = [
-    {
-      name: 'Keells Union Place',
-      rating: 4.4,
-      reviews: '1,500+',
-      eta: '10 min',
-      img: '/images/keels.png'
+      title: "40% Off for New Users*",
+      desc: "Valid on your first 2 orders above Rs. 1,000",
+      img: "/images/pizza.jpg",
+      cta: "Use Code: UBERSSL",
     },
     {
-      name: 'Pizza Hut',
-      rating: 4.5,
-      reviews: '3,000+',
-      eta: '20 min',
-      img: '/images/pizza.jpg'
+      title: "65% Off with Commercial Bank",
+      desc: "Valid for first 2 orders until 30 April",
+      img: "/images/kfc.jpg",
+      cta: "Use Code: CB650",
     },
     {
-        name: 'Keells Union Place',
-        rating: 4.4,
-        reviews: '1,500+',
-        eta: '10 min',
-        img: '/images/keels.png'
-      },
-      {
-        name: 'Pizza Hut',
-        rating: 4.5,
-        reviews: '3,000+',
-        eta: '20 min',
-        img: '/images/pizza.jpg'
-      },
-      {
-        name: 'Keells Union Place',
-        rating: 4.4,
-        reviews: '1,500+',
-        eta: '10 min',
-        img: '/images/keels.png'
-      },
-      {
-        name: 'Pizza Hut',
-        rating: 4.5,
-        reviews: '3,000+',
-        eta: '20 min',
-        img: '/images/pizza.jpg'
-      },
+      title: "40% Off for New Users*",
+      desc: "Valid on your first 2 orders above Rs. 1,000",
+      img: "/images/pizza.jpg",
+      cta: "Use Code: UBERSSL",
+    },
     {
-      name: 'KFC',
-      rating: 4.5,
-      reviews: '5,000+',
-      eta: '10 min',
-      img: '/images/kfc.jpg'
-    }
+      title: "65% Off with Commercial Bank",
+      desc: "Valid for first 2 orders until 30 April",
+      img: "/images/kfc.jpg",
+      cta: "Use Code: CB650",
+    },
   ];
 
   return (
@@ -176,22 +163,11 @@ export default function LandingPage() {
           <input type="text" placeholder="Search FoodFlix" className="bg-transparent outline-none w-full" />
         </div>
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => navigate("/login")}
-            className="text-sm text-gray-700 hover:text-[#ec5834] font-medium"
-          >
-            Log in
-          </button>
-          <button
-            onClick={() => navigate("/register")}
-            className="bg-[#ec5834] text-white px-4 py-1 rounded-full text-sm hover:bg-[#d94c2d]"
-          >
-            Sign up
-          </button>
+          <button onClick={() => navigate("/login")} className="text-sm text-gray-700 hover:text-[#ec5834] font-medium">Log in</button>
+          <button onClick={() => navigate("/register")} className="bg-[#ec5834] text-white px-4 py-1 rounded-full text-sm hover:bg-[#d94c2d]">Sign up</button>
         </div>
       </header>
 
-      {/* Location Picker Modal */}
       <LocationPickerModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
@@ -202,41 +178,16 @@ export default function LandingPage() {
         }}
       />
 
-      {/* Sidebar */}
-      {sidebarOpen && (
-        <>
-          <div className="fixed inset-0 bg-black bg-opacity-40 z-40" onClick={() => setSidebarOpen(false)} />
-          <div className="fixed top-0 left-0 h-full w-72 bg-white shadow-xl z-50 transform transition-transform duration-300">
-            <div className="p-5 flex flex-col gap-6 text-sm text-gray-900">
-              <div className="flex justify-between items-center mb-2">
-                <h2 className="text-lg font-bold">Welcome</h2>
-                <button onClick={() => setSidebarOpen(false)} className="text-lg text-gray-500 font-bold">×</button>
-              </div>
-              <button onClick={() => navigate("/register")} className="w-full bg-black text-white py-2 rounded-lg text-center font-semibold">Sign up</button>
-              <button onClick={() => navigate("/login")} className="w-full border border-gray-300 py-2 rounded-lg text-center">Log in</button>
-              <div className="mt-2 space-y-3">
-                <p className="hover:text-[#ec5834] cursor-pointer flex items-center gap-2">
-                  <Utensils className="h-4 w-4" /> Add your restaurant
-                </p>
-                <p className="hover:text-[#ec5834] cursor-pointer flex items-center gap-2">
-                  <Bike className="h-4 w-4" /> Sign up to deliver
-                </p>
-              </div>
-            </div>
-          </div>
-        </>
-      )}
-
-      {/* Categories */}
+      {/* Categories + Tags */}
       <section className="relative px-4 py-4">
         <button onClick={scrollLeft} className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-white shadow rounded-full p-1">
           <ChevronLeft className="h-5 w-5 text-[#ec5834]" />
         </button>
         <div ref={scrollRef} className="overflow-x-auto whitespace-nowrap scrollbar-hide flex space-x-4 px-6">
-          {categories.map((cat) => (
-            <div key={cat.name} className="flex flex-col items-center text-sm min-w-fit">
-              <div className="text-2xl">{cat.icon}</div>
-              <span className="text-gray-700">{cat.name}</span>
+          {combinedItems.map((cat) => (
+            <div key={cat} className="flex flex-col items-center text-sm min-w-fit">
+              <div className="text-2xl">{categoryIconMap[cat] || "🍽️"}</div>
+              <span className="text-gray-700">{cat}</span>
             </div>
           ))}
         </div>
@@ -284,14 +235,13 @@ export default function LandingPage() {
       <section className="px-4 pb-10">
         <h3 className="text-2xl font-bold text-gray-900 mb-4">All Stores</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {stores.map((store, index) => (
-            <div key={index} className="bg-white rounded-xl overflow-hidden shadow hover:shadow-lg transition duration-300">
-              <img src={store.img} alt={store.name} className="h-40 w-full object-cover" />
+          {restaurants.map((store, index) => (
+            <div key={store._id || index} className="bg-white rounded-xl overflow-hidden shadow hover:shadow-lg transition duration-300">
+              <img src={store.profileImage || "/images/restaurant-placeholder.jpg"} alt={store.name} className="h-40 w-full object-cover" />
               <div className="p-4">
                 <h4 className="text-lg font-semibold text-gray-800">{store.name}</h4>
-                <p className="text-sm text-gray-500">
-                  <span className="font-semibold text-black">{store.rating}★</span> ({store.reviews}) • {store.eta}
-                </p>
+                <p className="text-sm text-gray-500">{store.cuisineType || "Cuisine"} • {store.openingHours || "Open hours"}</p>
+                <p className="text-xs text-gray-500 mt-1">{store.address || "No address provided"}</p>
               </div>
             </div>
           ))}
