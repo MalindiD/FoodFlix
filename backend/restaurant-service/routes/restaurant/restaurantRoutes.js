@@ -7,6 +7,7 @@ const upload = require("../../middleware/multerConfig");
 
 // Restaurant routes
 router.get("/", restaurantController.getAllRestaurants);
+router.get("/filter", restaurantController.filterByCategoryOrTag);
 router.get("/:id", restaurantController.getRestaurantById);
 router.post("/", restaurantController.createRestaurant);
 router.put(

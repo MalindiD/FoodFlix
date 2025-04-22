@@ -21,12 +21,12 @@ function App() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/restaurant/:id" element={<RestaurantDetail />} />
       
       {/* Protected Customer Routes */}
       {user?.role === 'customer' && (
         <>
           <Route path="/dashboard" element={<CustomerDashboard />} />
-          <Route path="/restaurant/:id" element={<RestaurantDetail />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/order-success" element={<OrderSuccess />} />
