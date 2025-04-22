@@ -39,8 +39,8 @@ spec:
         - name: JWT_SECRET
           valueFrom:
             secretKeyRef:
-              name: jwt-secret
-              key: secret
+              name: mongodb-secret   
+              key: jwt_secret_key
         - name: JWT_EXPIRE
           value: "30d"
         - name: ORDER_SERVICE_URL
@@ -48,9 +48,12 @@ spec:
         - name: NOTIFICATION_SERVICE_URL
           value: "http://notification-service:5000"
         - name: CLIENT_URL
-          value: "http://frontend:3000"
+          value: "http://frontend:3001"
         - name: API_URL
           value: "http://payment-service:3000"
+        - name: CORS_ALLOW_ORIGIN
+          value: "*" 
+          
         # Stripe configuration
         - name: STRIPE_SECRET_KEY
           valueFrom:
@@ -109,6 +112,7 @@ data:
   stripe-secret-key: c2tfdGVzdF81MXlvdXJfa2V5X2hlcmU=
   stripe-webhook-secret: d2hzZWNfeW91cl9zdHJpcGVfd2ViaG9va19zZWNyZXQ=
 ---
+# NetworkPolicy to restrict access to the payment service
 # NetworkPolicy to restrict access to the payment service
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy

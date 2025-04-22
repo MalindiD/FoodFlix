@@ -2,41 +2,47 @@
 const jwt = require('jsonwebtoken');
 const asyncHandler = require('../utils/async');
 const ErrorResponse = require('../utils/errorResponse');
-const User = require('../models/User');
+const User = require('../models/User'); // Optional: only if you're querying MongoDB for user
 
-// Protect routes
+// ✅ Middleware to protect routes
 exports.protect = asyncHandler(async (req, res, next) => {
   let token;
 
+  // Extract token from Authorization header
   if (
     req.headers.authorization &&
     req.headers.authorization.startsWith('Bearer')
   ) {
-    // Set token from Bearer token in header
     token = req.headers.authorization.split(' ')[1];
   } else if (req.cookies?.token) {
-    // Set token from cookie
     token = req.cookies.token;
   }
 
-  // Make sure token exists
+  // If token missing, throw error
   if (!token) {
     return next(new ErrorResponse('Not authorized to access this route', 401));
   }
 
   try {
-    // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // ✅ Log the token and secret used for debugging
+    console.log('[🔐 JWT TOKEN]', token);
+    console.log('[🔐 JWT SECRET USED]', process.env.JWT_SECRET);
 
+    // ✅ Verify and decode the token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log('[✅ JWT DECODED]', decoded);
+
+    // Optionally fetch user from DB
     req.user = await User.findById(decoded.id);
 
     next();
   } catch (err) {
+    console.error('[❌ JWT ERROR]', err.message);
     return next(new ErrorResponse('Not authorized to access this route', 401));
   }
 });
 
-// Grant access to specific roles
+// ✅ Role-based access control
 exports.authorize = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {

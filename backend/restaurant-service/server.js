@@ -9,7 +9,7 @@ const app = express();
 // Middlewares
 app.use(
   cors({
-    origin: "http://localhost:3000", // React frontend origin
+    origin: "http://localhost:3001", // React frontend origin
     credentials: true
   })
 );
@@ -20,7 +20,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads"))); // Static 
 mongoose
   .connect(
     process.env.MONGO_URI ||
-      "mongodb://username:password@cluster0-shard-00-00.j0p0p.mongodb.net:27017,cluster0-shard-00-01.j0p0p.mongodb.net:27017,cluster0-shard-00-02.j0p0p.mongodb.net:27017/test?ssl=true&replicaSet=atlas-xxxxxx-shard-0&authSource=admin&retryWrites=true&w=majority",
+      "mongodb+srv://y3s2projectgroup:JuQT6yqnVdZ6FQ97@foodflix.j0p0p.mongodb.net/",
     {
       useNewUrlParser: true,
       useUnifiedTopology: true,

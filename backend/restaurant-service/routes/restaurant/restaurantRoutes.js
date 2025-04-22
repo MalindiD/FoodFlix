@@ -16,7 +16,7 @@ router.put(
 );
 router.delete("/:id", restaurantController.deleteRestaurant);
 router.patch("/:id/availability", restaurantController.updateAvailability);
-
+router.use("/menu-items", menuItemRoutes); 
 // Nested routes
 router.use("/:restaurantId/menu-items", menuItemRoutes);
 router.use("/:restaurantId/orders", orderRoutes);
