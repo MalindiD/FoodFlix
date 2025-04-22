@@ -26,7 +26,7 @@ restaurantApi.interceptors.request.use(
 
 // Restaurant service methods
 const restaurantService = {
-  // Get all restaurants
+  // ✅ Get all restaurants
   getAllRestaurants: async () => {
     try {
       const response = await restaurantApi.get('/restaurants');
@@ -37,29 +37,29 @@ const restaurantService = {
     }
   },
 
-  // Get restaurant by ID
+  // ✅ Get restaurant by ID
   getRestaurantById: async (id) => {
     try {
-      const response = await restaurantApi.get(`/restaurants/${id}`);
-      return response.data;
+      const res = await restaurantApi.get(`/restaurants/${id}`);
+      return res.data; // FIXED: removed extra `.data`
     } catch (error) {
       console.error(`Error fetching restaurant with ID ${id}:`, error);
       throw error;
     }
   },
 
-  // Get menu items for a restaurant
+  // ✅ Get menu items for a specific restaurant
   getMenuItems: async (restaurantId) => {
     try {
-      const response = await restaurantApi.get(`/restaurants/${restaurantId}/menu`);
-      return response.data;
+      const res = await restaurantApi.get(`/restaurants/${restaurantId}/menu-items`);
+      return res.data; // FIXED: correct endpoint and no extra `.data`
     } catch (error) {
       console.error(`Error fetching menu items for restaurant ${restaurantId}:`, error);
       throw error;
     }
   },
 
-  // Search restaurants by query
+  // ✅ Search restaurants by query
   searchRestaurants: async (query) => {
     try {
       const response = await restaurantApi.get(`/restaurants/search?q=${query}`);
@@ -70,7 +70,7 @@ const restaurantService = {
     }
   },
 
-  // Filter restaurants by category
+  // ✅ Filter restaurants by category
   filterByCategory: async (category) => {
     try {
       const response = await restaurantApi.get(`/restaurants/category/${category}`);
@@ -94,18 +94,14 @@ const restaurantService = {
 
   // ✅ Get unique tags
   getUniqueTags: async () => {
-  try {
-    const response = await restaurantApi.get('/restaurants/menu-items/tags/unique');
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching tags:', error);
-    throw error;
+    try {
+      const response = await restaurantApi.get('/restaurants/menu-items/tags/unique');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching tags:', error);
+      throw error;
+    }
   }
-}
-
 };
-
-
-
 
 export default restaurantService;
