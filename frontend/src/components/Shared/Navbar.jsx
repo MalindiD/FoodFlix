@@ -1,6 +1,5 @@
-// src/components/Shared/Navbar.jsx
 import React, { useContext, useState, useEffect } from "react";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from "react-router-dom";
 import {
   Menu,
   Search,
@@ -14,16 +13,17 @@ import {
   LogOut,
   Bookmark,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import AuthContext from "../../context/AuthContext";
+import restaurantService from "../../api/restaurantService";
 import LocationPickerModal from "./LocationPickerModal";
 
-export default function Navbar() {
+export default function Navbar({ onSearch }) {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [location, setLocation] = useState("141/6 Vauxhall St");
   const [modalOpen, setModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const savedLocation = localStorage.getItem("userLocation");
@@ -35,6 +35,25 @@ export default function Navbar() {
     navigate("/");
   };
 
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    const trimmed = searchTerm.trim();
+  
+    try {
+      if (trimmed && onSearch) {
+        const results = await restaurantService.searchRestaurants(trimmed);
+        onSearch(results);
+      } else if (onSearch) {
+        // 👇 Clear search → Show all restaurants again
+        const all = await restaurantService.getAllRestaurants();
+        onSearch(all);
+      }
+    } catch (error) {
+      console.error("Search failed:", error.message);
+    }
+  };
+  
+
   return (
     <>
       {/* Top Navbar */}
@@ -44,7 +63,9 @@ export default function Navbar() {
           <button onClick={() => setSidebarOpen(true)}>
             <Menu className="h-6 w-6 text-[#ec5834]" />
           </button>
-          <h1 className="text-xl font-bold text-[#ec5834]">FoodFlix</h1>
+          <h1 className="text-xl font-bold text-[#ec5834] cursor-pointer" onClick={() => navigate("/")}>
+            FoodFlix
+          </h1>
         </div>
 
         {/* Center */}
@@ -56,14 +77,33 @@ export default function Navbar() {
             <MapPin className="h-4 w-4" />
             <span>{location} • Now ▼</span>
           </div>
-          <div className="bg-gray-100 px-3 py-1 rounded-full flex items-center text-sm text-gray-600 w-48 sm:w-64">
-            <Search className="h-4 w-4 mr-2 text-gray-500" />
-            <input
-              type="text"
-              placeholder="Search FoodFlix"
-              className="bg-transparent outline-none w-full"
-            />
-          </div>
+          <form
+  onSubmit={handleSearch}
+  className="bg-gray-100 px-3 py-1 rounded-full flex items-center text-sm text-gray-600 w-48 sm:w-64"
+>
+  <Search className="h-4 w-4 mr-2 text-gray-500" />
+  <input
+  type="text"
+  placeholder="Search FoodFlix"
+  value={searchTerm}
+  onChange={async (e) => {
+    const val = e.target.value;
+    setSearchTerm(val);
+
+    if (val.trim() === "") {
+      const all = await restaurantService.getAllRestaurants();
+      if (onSearch) onSearch(all);
+    } else {
+      const results = await restaurantService.searchRestaurants(val.trim());
+      if (onSearch) onSearch(results);
+    }
+  }}
+  className="bg-transparent outline-none w-full"
+/>
+
+
+</form>
+
         </div>
 
         {/* Right */}
@@ -137,7 +177,6 @@ export default function Navbar() {
             </button>
           </div>
 
-          {/* Menu Items */}
           <ul className="space-y-5 text-gray-800 text-[15px] font-medium">
             <li className="flex items-center gap-3 hover:text-[#ec5834] cursor-pointer">
               <Bookmark className="h-5 w-5" /> Orders
@@ -146,9 +185,9 @@ export default function Navbar() {
               <Heart className="h-5 w-5" /> Favorites
             </li>
             <li className="flex items-center gap-3 hover:text-[#ec5834] cursor-pointer">
-  <Wallet className="h-5 w-5" />
-  <Link to="/checkout">Wallet</Link>
-</li>
+              <Wallet className="h-5 w-5" />
+              <Link to="/checkout">Wallet</Link>
+            </li>
             <li className="flex items-center gap-3 hover:text-[#ec5834] cursor-pointer">
               <HelpCircle className="h-5 w-5" /> Help
             </li>
@@ -157,7 +196,6 @@ export default function Navbar() {
             </li>
           </ul>
 
-          {/* Signout */}
           <div className="border-t my-6 pt-4">
             <div
               onClick={handleLogout}
@@ -168,7 +206,6 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* Business Links */}
           <div className="border-t pt-4 text-[15px] space-y-3 text-gray-800 font-medium">
             <p className="hover:text-[#ec5834] cursor-pointer">
               Create a business account
@@ -183,7 +220,6 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Overlay */}
       {sidebarOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-40 z-40"

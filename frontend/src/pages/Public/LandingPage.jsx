@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Menu, Search, ChevronLeft, ChevronRight, MapPin,
+  Menu, Search, ChevronLeft, ChevronRight, MapPin, Utensils, Bike,
 } from "lucide-react";
 import restaurantService from "../../api/restaurantService";
 import LocationPickerModal from "../../components/Shared/LocationPickerModal";
@@ -11,10 +11,10 @@ export default function LandingPage() {
   const scrollRef = useRef(null);
   const offerScrollRef = useRef(null);
 
-  const [setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [location, setLocation] = useState("141/6 Vauxhall St");
-
+  const [searchTerm, setSearchTerm] = useState("");
   const [restaurants, setRestaurants] = useState([]);
   const [categories, setCategories] = useState([]);
   const [tags, setTags] = useState([]);
@@ -32,6 +32,13 @@ export default function LandingPage() {
     fetchTags();
   }, []);
 
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      handleSearch(searchTerm);
+    }, 300);
+    return () => clearTimeout(timeout);
+  }, [searchTerm]);
+
   const fetchRestaurants = async () => {
     try {
       setLoading(true);
@@ -43,6 +50,20 @@ export default function LandingPage() {
       setError("Failed to load restaurants.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSearch = async (term) => {
+    try {
+      if (term.trim()) {
+        const results = await restaurantService.searchRestaurants(term);
+        setRestaurants(results || []);
+        setSelectedCategory(null);
+      } else {
+        fetchRestaurants();
+      }
+    } catch (err) {
+      setError("Failed to search restaurants.");
     }
   };
 
@@ -105,7 +126,6 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-[#f0f1f5] text-[#333]">
-      {/* Header */}
       <header className="bg-white shadow-md px-4 py-2 flex items-center justify-between sticky top-0 z-50">
         <div className="flex items-center gap-4">
           <button onClick={() => setSidebarOpen(true)}><Menu className="h-6 w-6 text-[#ec5834]" /></button>
@@ -117,7 +137,13 @@ export default function LandingPage() {
         </div>
         <div className="bg-gray-100 px-3 py-1 rounded-full flex items-center text-sm text-gray-600 w-48 sm:w-64">
           <Search className="h-4 w-4 mr-2 text-gray-500" />
-          <input type="text" placeholder="Search FoodFlix" className="bg-transparent outline-none w-full" />
+          <input
+            type="text"
+            placeholder="Search FoodFlix"
+            className="bg-transparent outline-none w-full"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
         <div className="flex items-center gap-2">
           <button onClick={() => navigate("/login")} className="text-sm text-gray-700 hover:text-[#ec5834] font-medium">Log in</button>
@@ -125,7 +151,6 @@ export default function LandingPage() {
         </div>
       </header>
 
-      {/* Location Picker Modal */}
       <LocationPickerModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
@@ -136,7 +161,7 @@ export default function LandingPage() {
         }}
       />
 
-      {/* Category/Tag Filter Scroll */}
+      {/* Filters */}
       <section className="relative px-4 py-4">
         <button onClick={scrollLeft} className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow rounded-full p-1">
           <ChevronLeft className="h-5 w-5 text-[#ec5834]" />
@@ -145,9 +170,7 @@ export default function LandingPage() {
           {combinedItems.map((cat) => (
             <div
               key={cat}
-              className={`flex flex-col items-center text-sm min-w-fit cursor-pointer ${
-                selectedCategory === cat ? "text-[#ec5834] font-bold" : "text-gray-700"
-              }`}
+              className={`flex flex-col items-center text-sm min-w-fit cursor-pointer ${selectedCategory === cat ? "text-[#ec5834] font-bold" : "text-gray-700"}`}
               onClick={() => handleCategorySelect(cat)}
             >
               <div className="text-2xl">{categoryIconMap[cat] || "🍽️"}</div>
@@ -160,7 +183,7 @@ export default function LandingPage() {
         </button>
       </section>
 
-      {/* Offers Scroll */}
+      {/* Offers */}
       <section className="relative px-4 pb-8">
         <button onClick={scrollOfferLeft} className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-white shadow rounded-full p-1">
           <ChevronLeft className="h-5 w-5 text-[#ec5834]" />
@@ -208,6 +231,27 @@ export default function LandingPage() {
           </div>
         )}
       </section>
+
+      {/* Sidebar */}
+      {sidebarOpen && (
+        <>
+          <div className="fixed inset-0 bg-black bg-opacity-40 z-40" onClick={() => setSidebarOpen(false)} />
+          <div className="fixed top-0 left-0 h-full w-72 bg-white shadow-xl z-50">
+            <div className="p-5 flex flex-col gap-6 text-sm text-gray-900">
+              <div className="flex justify-between items-center mb-2">
+                <h2 className="text-lg font-bold">Welcome</h2>
+                <button onClick={() => setSidebarOpen(false)} className="text-lg text-gray-500 font-bold">×</button>
+              </div>
+              <button onClick={() => { navigate("/register"); setSidebarOpen(false); }} className="w-full bg-black text-white py-2 rounded-lg font-semibold">Sign up</button>
+              <button onClick={() => { navigate("/login"); setSidebarOpen(false); }} className="w-full border border-gray-300 py-2 rounded-lg">Log in</button>
+              <div className="mt-2 space-y-3">
+                <p className="hover:text-[#ec5834] cursor-pointer flex items-center gap-2"><Utensils className="h-4 w-4" /> Add your restaurant</p>
+                <p className="hover:text-[#ec5834] cursor-pointer flex items-center gap-2"><Bike className="h-4 w-4" /> Sign up to deliver</p>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }

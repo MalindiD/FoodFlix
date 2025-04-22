@@ -122,3 +122,15 @@ exports.filterByCategoryOrTag = async (req, res) => {
     res.status(500).json({ message: "Error filtering restaurants", error: error.message });
   }
 };
+
+// ✅ Search restaurants by name
+exports.searchRestaurants = async (req, res) => {
+  try {
+    const { q } = req.query;
+    const regex = new RegExp(q, "i"); // Case-insensitive search
+    const results = await Restaurant.find({ name: { $regex: regex } });
+    res.status(200).json(results);
+  } catch (error) {
+    res.status(500).json({ message: "Search failed", error: error.message });
+  }
+};

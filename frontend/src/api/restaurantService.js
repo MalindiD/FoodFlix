@@ -69,6 +69,7 @@ const restaurantService = {
     const res = await restaurantApi.get(`/restaurants/filter?keyword=${keyword}`);
     return res.data;
   },
+  
 };
 
 export default restaurantService;

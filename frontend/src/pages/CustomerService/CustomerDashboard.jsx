@@ -169,7 +169,11 @@ export default function CustomerDashboard() {
 
   return (
     <div className="min-h-screen bg-[#f0f1f5] text-[#333]">
-      <Navbar />
+      <Navbar onSearch={(results) => {
+  setRestaurants(results);
+  setSelectedCategory(null); // Optional: reset filter when searching
+}} />
+
 
       {/* Categories */}
       <section className="relative px-4 py-4">
