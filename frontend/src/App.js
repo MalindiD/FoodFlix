@@ -13,6 +13,9 @@ import RestaurantLogin from "./restaurant-management/pages/RestaurantLogin";
 import RestaurantRegister from "./restaurant-management/pages/RestaurantRegister";
 
 import PaymentPage from "./pages/PaymentPage";
+import MenuPage from "./pages/MenuPage";
+import CheckoutPage from "./pages/CheckoutPage";
+
 
 function App() {
   return (
@@ -45,6 +48,8 @@ function App() {
           />
 
           <Route path="/payment" element={<PaymentPage />} />
+          <Route path="/menu" element={<MenuPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
         </Routes>
       </div>
     </Router>
