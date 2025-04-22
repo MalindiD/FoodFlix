@@ -9,6 +9,7 @@ import RestaurantDetail from './pages/CustomerService/RestaurantDetail';
 import Cart from './pages/CustomerService/Cart';
 import OrderSuccess from './pages/CustomerService/OrderSuccess';
 import CheckoutPage from './pages/CustomerService/CheckoutPage';
+import PaymentSuccess from './pages/CustomerService/PaymentSuccess'; 
 
 import AuthContext from './context/AuthContext';
 
@@ -29,6 +30,7 @@ function App() {
           <Route path="/dashboard" element={<CustomerDashboard />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/order-success" element={<OrderSuccess />} />
         </>
       )}
