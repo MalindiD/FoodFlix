@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Navbar from '../../components/Shared/Navbar';
 import restaurantService from '../../api/restaurantService';
+import { Link } from 'react-router-dom';
 
 export default function CustomerDashboard() {
   const scrollRef = useRef(null);
@@ -22,6 +23,7 @@ export default function CustomerDashboard() {
     Burgers: '🍔',
     Sushi: '🍣',
     Pasta: '🍝',
+    Spaghetti: '🍝',
     Noodles: '🍜',
     Seafood: '🦞',
     Soup: '🥣',
@@ -32,6 +34,7 @@ export default function CustomerDashboard() {
     Veg: '🥦',
     Spicy: '🌶️',
     Salad: '🥬',
+    Lasagna: '🍛',
     Donuts: '🍩',
     Wraps: '🌯',
   
@@ -233,32 +236,33 @@ export default function CustomerDashboard() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {restaurants.map((store, index) => (
-              <div
-                key={store._id || index}
-                className="bg-white rounded-xl overflow-hidden shadow hover:shadow-lg transition duration-300 cursor-pointer"
-              >
-                <img
-                  src={store.profileImage || '/images/restaurant-placeholder.jpg'}
-                  alt={store.name}
-                  className="h-40 w-full object-cover"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = '/images/restaurant-placeholder.jpg';
-                  }}
-                />
-                <div className="p-4">
-                  <h4 className="text-lg font-semibold text-gray-800">{store.name}</h4>
-                  <p className="text-sm text-gray-500">
-                    {store.cuisineType || 'Cuisine'} • {store.openingHours || 'Open hours'}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    {store.address || 'No address provided'}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
+  {restaurants.map((store, index) => (
+    <Link
+      to={`/restaurant/${store._id}`}  // ✅ Link to the detail page
+      key={store._id || index}
+      className="bg-white rounded-xl overflow-hidden shadow hover:shadow-lg transition duration-300 cursor-pointer"
+    >
+      <img
+        src={store.profileImage || '/images/restaurant-placeholder.jpg'}
+        alt={store.name}
+        className="h-40 w-full object-cover"
+        onError={(e) => {
+          e.target.onerror = null;
+          e.target.src = '/images/restaurant-placeholder.jpg';
+        }}
+      />
+      <div className="p-4">
+        <h4 className="text-lg font-semibold text-gray-800">{store.name}</h4>
+        <p className="text-sm text-gray-500">
+          {store.cuisineType || 'Cuisine'} • {store.openingHours || 'Open hours'}
+        </p>
+        <p className="text-xs text-gray-500 mt-1">
+          {store.address || 'No address provided'}
+        </p>
+      </div>
+    </Link>
+  ))}
+</div>
         )}
       </section>
     </div>
