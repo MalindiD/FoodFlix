@@ -10,6 +10,7 @@ import {
 
 import Navbar from '../../components/Shared/Navbar';
 import restaurantService from '../../api/restaurantService';
+import { useCart } from "../../context/CartContext";
 
 export default function RestaurantDetail() {
   const { id } = useParams();
@@ -20,6 +21,7 @@ export default function RestaurantDetail() {
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [filters, setFilters] = useState([]);
   const scrollRef = useRef(null);
+  const { addToCart } = useCart();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -148,6 +150,15 @@ export default function RestaurantDetail() {
                 <span className="text-md font-bold text-gray-800">Rs. {item.price}</span>
                 <button
                   className="bg-[#ec5834] text-white px-3 py-1 rounded-full hover:bg-[#d94c2d] transition"
+                  onClick={() =>
+                    addToCart({
+                      id: item._id,
+                      name: item.name,
+                      price: item.price,
+                      restaurantId: restaurant._id,
+                      restaurantName: restaurant.name,
+                    })
+                  }
                 >
                   <Plus size={16} />
                 </button>

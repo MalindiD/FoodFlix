@@ -224,55 +224,55 @@ exports.getRestaurantOrders = async (req, res) => {
 };
 
 // Update payment status
-exports.updatePaymentStatus = async (req, res) => {
-  try {
-    const { paymentStatus } = req.body;
+// exports.updatePaymentStatus = async (req, res) => {
+//   try {
+//     const { paymentStatus } = req.body;
     
-    // Validate payment status
-    const validStatuses = ['Pending', 'Completed', 'Failed'];
-    if (!validStatuses.includes(paymentStatus)) {
-      return res.status(400).json({ message: 'Invalid payment status' });
-    }
+//     // Validate payment status
+//     const validStatuses = ['Pending', 'Completed', 'Failed'];
+//     if (!validStatuses.includes(paymentStatus)) {
+//       return res.status(400).json({ message: 'Invalid payment status' });
+//     }
     
-    const order = await Order.findById(req.params.id);
+//     const order = await Order.findById(req.params.id);
     
-    if (!order) {
-      return res.status(404).json({ message: 'Order not found' });
-    }
+//     if (!order) {
+//       return res.status(404).json({ message: 'Order not found' });
+//     }
     
-    // Only payment service or admin should update payment status
-    if (req.user.role !== 'payment' && req.user.role !== 'admin') {
-      return res.status(403).json({ message: 'Not authorized' });
-    }
+//     // Only payment service or admin should update payment status
+//     if (req.user.role !== 'payment' && req.user.role !== 'admin') {
+//       return res.status(403).json({ message: 'Not authorized' });
+//     }
     
-    order.paymentStatus = paymentStatus;
-    await order.save();
+//     order.paymentStatus = paymentStatus;
+//     await order.save();
     
-    // If payment completed successfully, update order status to Confirmed
-    if (paymentStatus === 'Completed' && order.status === 'Pending') {
-      order.status = 'Confirmed';
-      await order.save();
+//     // If payment completed successfully, update order status to Confirmed
+//     if (paymentStatus === 'Completed' && order.status === 'Pending') {
+//       order.status = 'Confirmed';
+//       await order.save();
       
-      // Notify restaurant about confirmed order
-      await publishToQueue('restaurant_notifications', {
-        type: 'ORDER_CONFIRMED',
-        orderId: order._id,
-        restaurantId: order.restaurantId
-      });
+//       // Notify restaurant about confirmed order
+//       await publishToQueue('restaurant_notifications', {
+//         type: 'ORDER_CONFIRMED',
+//         orderId: order._id,
+//         restaurantId: order.restaurantId
+//       });
       
-      // Notify customer about confirmed order
-      await publishToQueue('customer_notifications', {
-        type: 'ORDER_STATUS_CHANGED',
-        customerId: order.customerId,
-        orderId: order._id,
-        previousStatus: 'Pending',
-        newStatus: 'Confirmed'
-      });
-    }
+//       // Notify customer about confirmed order
+//       await publishToQueue('customer_notifications', {
+//         type: 'ORDER_STATUS_CHANGED',
+//         customerId: order.customerId,
+//         orderId: order._id,
+//         previousStatus: 'Pending',
+//         newStatus: 'Confirmed'
+//       });
+//     }
     
-    res.json(order);
-  } catch (error) {
-    console.error('Error updating payment status:', error);
-    res.status(500).json({ message: 'Error updating payment status' });
-  }
-};
+//     res.json(order);
+//   } catch (error) {
+//     console.error('Error updating payment status:', error);
+//     res.status(500).json({ message: 'Error updating payment status' });
+//   }
+// };

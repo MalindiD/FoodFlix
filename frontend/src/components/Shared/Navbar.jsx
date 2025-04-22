@@ -17,6 +17,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import AuthContext from "../../context/AuthContext";
 import LocationPickerModal from "./LocationPickerModal";
+import { useCart } from "../../context/CartContext";
 
 export default function Navbar() {
   const { user, logout } = useContext(AuthContext);
@@ -24,6 +25,8 @@ export default function Navbar() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [location, setLocation] = useState("141/6 Vauxhall St");
   const [modalOpen, setModalOpen] = useState(false);
+  const { cart, setIsOpen } = useCart();
+  const count = cart.reduce((a, b) => a + b.quantity, 0);
 
   useEffect(() => {
     const savedLocation = localStorage.getItem("userLocation");
@@ -68,11 +71,15 @@ export default function Navbar() {
 
         {/* Right */}
         <div className="flex items-center gap-4 text-sm">
-          <div className="relative">
+          <div className="relative"
+          onClick={() => setIsOpen((v) => !v)}
+          aria-label="Cart">
             <ShoppingBag className="h-5 w-5 text-gray-600" />
+            {count > 0 && (
             <span className="absolute -top-2 -right-2 bg-green-600 text-white text-xs rounded-full px-1">
-              0
+              {count}
             </span>
+             )}
           </div>
           {user ? (
             <button

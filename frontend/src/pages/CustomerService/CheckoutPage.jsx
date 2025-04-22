@@ -9,6 +9,7 @@ const CheckoutPage = () => {
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const cartSubtotal = Number(localStorage.getItem('cartSubtotal')) || 0;
   
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -54,7 +55,7 @@ const CheckoutPage = () => {
           // Use a valid MongoDB ObjectId format (24 hex characters)
           orderId: '6603f9a68b1a5a6c3218c4f1', // This is a valid format from your logs
           paymentMethod: 'stripe',
-          amount: 2297,
+          amount: cartSubtotal,
           currency: 'usd', // Your logs show you're using 'usd'
           customerName: 'Test User',
           customerEmail: 'testuser@example.com',
@@ -112,7 +113,7 @@ const CheckoutPage = () => {
           className="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 rounded-lg font-semibold"
           disabled={!stripe || loading}
         >
-          {loading ? 'Processing...' : 'Pay Rs. 2297'}
+          {loading ? 'Processing...' : `Pay Rs. ${cartSubtotal}`}
         </button>
       </form>
     </div>

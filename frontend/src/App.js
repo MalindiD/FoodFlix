@@ -11,9 +11,32 @@ import OrderSuccess from './pages/CustomerService/OrderSuccess';
 import CheckoutPage from './pages/CustomerService/CheckoutPage';
 
 import AuthContext from './context/AuthContext';
+import { CartProvider } from "./context/CartContext";
+import CartPopup from "./components/CartPopup";
 
 function App() {
   const { user } = useContext(AuthContext);
+
+  if (user?.role === 'customer') {
+    return (
+      <CartProvider>
+        <CartPopup />
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/dashboard" element={<CustomerDashboard />} />
+          <Route path="/restaurant/:id" element={<RestaurantDetail />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/order-success" element={<OrderSuccess />} />
+          {/* Catch-all for customers */}
+          <Route path="*" element={<Navigate to="/dashboard" />} />
+        </Routes>
+      </CartProvider>
+    );
+  }
+
   
   return (
     <Routes>
@@ -22,7 +45,7 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       
-      {/* Protected Customer Routes */}
+      {/* Protected Customer Routes
       {user?.role === 'customer' && (
         <>
           <Route path="/dashboard" element={<CustomerDashboard />} />
@@ -31,7 +54,7 @@ function App() {
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/order-success" element={<OrderSuccess />} />
         </>
-      )}
+      )} */}
       
       {/* Delivery Role Routes */}
       {user?.role === 'delivery' && (
