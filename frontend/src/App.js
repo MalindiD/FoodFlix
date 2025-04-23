@@ -10,6 +10,7 @@ import Cart from './pages/CustomerService/Cart';
 import OrderSuccess from './pages/CustomerService/OrderSuccess';
 import CheckoutPage from './pages/CustomerService/CheckoutPage';
 import PaymentSuccess from './pages/CustomerService/PaymentSuccess'; 
+import DeliveryDetailsPage from './pages/CustomerService/DeliveryDetailsPage';
 
 import AuthContext from './context/AuthContext';
 import { CartProvider } from "./context/CartContext";
@@ -31,6 +32,7 @@ function App() {
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/order-success" element={<OrderSuccess />} />
+          <Route path="/delivery-details" element={<DeliveryDetailsPage />} />
           {/* Catch-all for customers */}
           <Route path="*" element={<Navigate to="/dashboard" />} />
         </Routes>

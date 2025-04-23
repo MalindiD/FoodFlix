@@ -28,6 +28,11 @@ export default function CartPopup() {
     setIsOpen(false); // Close the popup
     navigate('/dashboard'); // Redirect to dashboard
   };
+
+  const handleGoToCheckout = () => {
+    setIsOpen(false); // Close the cart popup
+    navigate('/delivery-details'); // Navigate to delivery details page
+  };
   
 
   return (
@@ -127,12 +132,9 @@ export default function CartPopup() {
               LKR {subtotal.toLocaleString(undefined, {minimumFractionDigits:2})}
             </span>
           </div>
-          <Link
-            to="/checkout"
-            className="block w-full bg-black text-white text-center py-3 rounded font-semibold text-lg"
-          >
-            Go to checkout
-          </Link>
+          <button onClick={handleGoToCheckout} className="block w-full bg-black text-white text-center py-3 rounded font-semibold text-lg">
+            Go to Checkout
+          </button>
         </div>
       </div>
     </div>

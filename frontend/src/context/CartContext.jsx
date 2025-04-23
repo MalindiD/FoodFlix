@@ -74,7 +74,11 @@ export const CartProvider = ({ children }) => {
     setCart(prev => prev.filter(item => item.id !== id));
   };
 
-  
+  const clearCart = () => {
+    setCart([]);
+    localStorage.removeItem('cart');
+    localStorage.setItem('cartSubtotal', 0);
+  };
 
   return (
     <CartContext.Provider
@@ -87,6 +91,7 @@ export const CartProvider = ({ children }) => {
         subtotal,
         isOpen,
         setIsOpen,
+        clearCart,
       }}
     >
       {children}

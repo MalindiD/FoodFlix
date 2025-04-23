@@ -8,6 +8,7 @@ import {
   CardCvcElement,
 } from '@stripe/react-stripe-js';
 import { useNavigate } from 'react-router-dom';
+import { useCart } from '../../context/CartContext';
 
 const CheckoutPage = () => {
   const stripe = useStripe();
@@ -17,7 +18,10 @@ const CheckoutPage = () => {
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
-  const cartSubtotal = Number(localStorage.getItem('cartSubtotal')) || 0;
+  const orderTotal = Number(localStorage.getItem('orderTotal')) || 0;
+  const location = localStorage.getItem('userLocation') || '';
+  const deliveryInstructions = localStorage.getItem('deliveryInstructions') || '';
+  const { clearCart } = useCart();
   
   const [zipCode, setZipCode] = useState('');
 
@@ -61,7 +65,7 @@ const CheckoutPage = () => {
         {
           orderId: '6603f9a68b1a5a6c3218c4f1',
           paymentMethod: 'stripe',
-          amount: cartSubtotal,
+          amount: orderTotal,
           currency: 'usd', // Your logs show you're using 'usd'
           customerName: 'Test User',
           customerEmail: 'testuser@example.com',
@@ -91,6 +95,7 @@ const CheckoutPage = () => {
         setErrorMsg(result.error.message);
       } else if (result.paymentIntent.status === 'succeeded') {
         setSuccessMsg('✅ Payment successful!');
+        clearCart();
       }
     } catch (error) {
       if (error.response) {
@@ -162,7 +167,7 @@ const CheckoutPage = () => {
               className="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 rounded-lg font-semibold"
               disabled={!stripe || loading}
             >
-              {loading ? 'Processing...' : `Pay Rs. ${cartSubtotal}`}
+              {loading ? 'Processing...' : `Pay Rs. ${orderTotal.toFixed(2)}`}
             </button>
           )}
         </form>
