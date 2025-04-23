@@ -18,49 +18,39 @@ export default function CustomerDashboard() {
 
 
   const categoryIconMap = {
-    Pizza: '🍕',
-    Bakery: '🥐',
-    Burgers: '🍔',
+    'Main Course': '🍽️',
+    'BBQ': '🍖',
+    'Bakery': '🥐',
+    'Beef': '🥩',
+    'Bubble Tea': '🧋',
+    'Burgers': '🍔',
+    'Cheese': '🧀',
+    'Chicken': '🍗',
+    'Chinese': '🥡',
+    'Donuts': '🍩',
+    'Fish': '🐟',
+    'Korean': '🍲',
+    'Lasagna': '🍛',
+    'Lasagne': '🍛',
+    'Macaroni': '🍝',
+    'Mexican': '🌮',
+    'Mozzarella': '🧀',
+    'Non-veg': '🥩',
+    'Pan Crust': '🍕',
+    'Pasta': '🍝',
+    'Seafood': '🦞',
+    'Pizza': '🍕',
+    'Rice': '🍚',
     Sushi: '🍣',
-    Pasta: '🍝',
     Spaghetti: '🍝',
     Noodles: '🍜',
-    Seafood: '🦞',
     Soup: '🥣',
-    BBQ: '🍖',
-    Chicken: '🍗',
-    Beef: '🥩',
-    'Non-veg': '🍖',
     Veg: '🥦',
     Spicy: '🌶️',
     Salad: '🥬',
-    Lasagna: '🍛',
-    Donuts: '🍩',
-    Wraps: '🌯',
-  
-    // 🍹 Beverages & Drinks
-    Beverages: '🥂',     // ✅ new
-    Drinks: '🥤',
-    Coffee: '☕',
-    'Bubble Tea': '🧋',
-    'Milkshake': '🥛',    // ✅ new
-  
-    // 🍨 Desserts
-    'Ice Cream': '🍦',
-  
-    // 🍽️ Cuisine Styles
-    Chinese: '🥡',
-    Indian: '🍛',
-    Korean: '🍲',
-    Mexican: '🌮',
-    'Fast Food': '🍟',
-    'Hot Dog': '🌭',
-  
-    // 🍱 General Categories
-    Snacks: '🍪',
-    'Main Course': '🍽️',  // ✅ new
-    Rice: '🍚'    
+    Wraps: '🌯'
   };
+  
   
   useEffect(() => {
     fetchRestaurants();
@@ -122,9 +112,26 @@ export default function CustomerDashboard() {
     }
   };
 
-  const handleCategorySelect = (category) => {
-    setSelectedCategory(category === selectedCategory ? null : category);
+  const handleCategorySelect = async (category) => {
+    if (category === selectedCategory) {
+      setSelectedCategory(null);
+      fetchRestaurants(); // Show all
+    } else {
+      setSelectedCategory(category);
+      try {
+        setLoading(true);
+        const data = await restaurantService.filterRestaurantsByCategoryOrTag(category);
+        setRestaurants(data || []);
+        setError(null);
+      } catch (err) {
+        setRestaurants([]);
+        setError("Failed to load filtered restaurants.");
+      } finally {
+        setLoading(false);
+      }
+    }
   };
+  
 
   const scrollLeft = () => scrollRef.current.scrollBy({ left: -300, behavior: 'smooth' });
   const scrollRight = () => scrollRef.current.scrollBy({ left: 300, behavior: 'smooth' });
@@ -162,7 +169,11 @@ export default function CustomerDashboard() {
 
   return (
     <div className="min-h-screen bg-[#f0f1f5] text-[#333]">
-      <Navbar />
+      <Navbar onSearch={(results) => {
+  setRestaurants(results);
+  setSelectedCategory(null); // Optional: reset filter when searching
+}} />
+
 
       {/* Categories */}
       <section className="relative px-4 py-4">

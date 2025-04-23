@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:5000/api';
 
-// Create an axios instance with default config
+// Create an axios instance
 const restaurantApi = axios.create({
   baseURL: API_URL,
   headers: {
@@ -10,7 +10,7 @@ const restaurantApi = axios.create({
   },
 });
 
-// Add a request interceptor to include the auth token in all requests
+// Add auth token if available
 restaurantApi.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -19,89 +19,57 @@ restaurantApi.interceptors.request.use(
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Restaurant service methods
 const restaurantService = {
   // ✅ Get all restaurants
   getAllRestaurants: async () => {
-    try {
-      const response = await restaurantApi.get('/restaurants');
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching restaurants:', error);
-      throw error;
-    }
+    const res = await restaurantApi.get('/restaurants');
+    return res.data;
   },
 
   // ✅ Get restaurant by ID
   getRestaurantById: async (id) => {
-    try {
-      const res = await restaurantApi.get(`/restaurants/${id}`);
-      return res.data; // FIXED: removed extra `.data`
-    } catch (error) {
-      console.error(`Error fetching restaurant with ID ${id}:`, error);
-      throw error;
-    }
+    const res = await restaurantApi.get(`/restaurants/${id}`);
+    return res.data;
   },
 
-  // ✅ Get menu items for a specific restaurant
+  // ✅ Get menu items of a restaurant
   getMenuItems: async (restaurantId) => {
-    try {
-      const res = await restaurantApi.get(`/restaurants/${restaurantId}/menu-items`);
-      return res.data; // FIXED: correct endpoint and no extra `.data`
-    } catch (error) {
-      console.error(`Error fetching menu items for restaurant ${restaurantId}:`, error);
-      throw error;
-    }
+    const res = await restaurantApi.get(`/restaurants/${restaurantId}/menu-items`);
+    return res.data;
   },
 
   // ✅ Search restaurants by query
   searchRestaurants: async (query) => {
-    try {
-      const response = await restaurantApi.get(`/restaurants/search?q=${query}`);
-      return response.data;
-    } catch (error) {
-      console.error('Error searching restaurants:', error);
-      throw error;
-    }
+    const res = await restaurantApi.get(`/restaurants/search?q=${query}`);
+    return res.data;
   },
 
-  // ✅ Filter restaurants by category
-  filterByCategory: async (category) => {
-    try {
-      const response = await restaurantApi.get(`/restaurants/category/${category}`);
-      return response.data;
-    } catch (error) {
-      console.error(`Error filtering restaurants by category ${category}:`, error);
-      throw error;
-    }
+  // ✅ Filter by category or tag (merged into one)
+  filterByCategoryOrTag: async (keyword) => {
+    const res = await restaurantApi.get(`/restaurants/filter?keyword=${keyword}`);
+    return res.data;
   },
 
   // ✅ Get unique menu categories
   getUniqueMenuCategories: async () => {
-    try {
-      const response = await restaurantApi.get('/restaurants/menu-items/all-categories');
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching menu categories:', error);
-      throw error;
-    }
+    const res = await restaurantApi.get('/restaurants/menu-items/all-categories');
+    return res.data;
   },
 
   // ✅ Get unique tags
   getUniqueTags: async () => {
-    try {
-      const response = await restaurantApi.get('/restaurants/menu-items/tags/unique');
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching tags:', error);
-      throw error;
-    }
-  }
+    const res = await restaurantApi.get('/restaurants/menu-items/tags/unique');
+    return res.data;
+  },
+
+  filterRestaurantsByCategoryOrTag: async (keyword) => {
+    const res = await restaurantApi.get(`/restaurants/filter?keyword=${keyword}`);
+    return res.data;
+  },
+  
 };
 
 export default restaurantService;

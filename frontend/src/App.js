@@ -9,6 +9,7 @@ import RestaurantDetail from './pages/CustomerService/RestaurantDetail';
 import Cart from './pages/CustomerService/Cart';
 import OrderSuccess from './pages/CustomerService/OrderSuccess';
 import CheckoutPage from './pages/CustomerService/CheckoutPage';
+import PaymentSuccess from './pages/CustomerService/PaymentSuccess'; 
 
 import AuthContext from './context/AuthContext';
 import { CartProvider } from "./context/CartContext";
@@ -44,14 +45,15 @@ function App() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/restaurant/:id" element={<RestaurantDetail />} />
       
       {/* Protected Customer Routes
       {user?.role === 'customer' && (
         <>
           <Route path="/dashboard" element={<CustomerDashboard />} />
-          <Route path="/restaurant/:id" element={<RestaurantDetail />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/order-success" element={<OrderSuccess />} />
         </>
       )} */}
