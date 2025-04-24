@@ -21,7 +21,9 @@ const CheckoutPage = () => {
   const orderTotal = Number(localStorage.getItem('orderTotal')) || 0;
   const location = localStorage.getItem('userLocation') || '';
   const deliveryInstructions = localStorage.getItem('deliveryInstructions') || '';
-  const { clearCart } = useCart();
+  const { cart,clearCart } = useCart();
+
+  const deliveryCoords = JSON.parse(localStorage.getItem('userLocationCoords')) 
   
   const [zipCode, setZipCode] = useState('');
 
@@ -54,6 +56,11 @@ const CheckoutPage = () => {
       setLoading(false);
       return;
     }
+    console.log("Delivery Coordinates:", 
+      localStorage.getItem('userLocationCoords'));
+    console.log("Parsed Coordinates:", 
+      JSON.parse(localStorage.getItem('userLocationCoords')));
+    
 
     try {
       await axios.get('http://localhost:3002/api/payments/health', {
@@ -94,8 +101,43 @@ const CheckoutPage = () => {
       if (result.error) {
         setErrorMsg(result.error.message);
       } else if (result.paymentIntent.status === 'succeeded') {
-        setSuccessMsg('✅ Payment successful!');
-        clearCart();
+        if (result.paymentIntent.status === 'succeeded') {
+          try {
+            const restaurantId = cart[0]?.restaurantId;
+            const deliveryCoords = JSON.parse(localStorage.getItem('userLocationCoords'));
+      
+            // 1. First save the order
+            await axios.post(
+              'http://localhost:4000/api/orders', // ✅ Correct port
+              {
+                restaurantId,
+                items: cart.map(item => ({
+                  menuItemId: item.id,
+                  name: item.name,
+                  price: item.price,
+                  quantity: item.quantity
+                })),
+                totalAmount: orderTotal,
+                deliveryAddress: deliveryCoords
+              },
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  'Content-Type': 'application/json'
+                }
+              }
+            );
+      
+            // 2. Then clear cart and show success
+            setSuccessMsg('✅ Payment successful!');
+            clearCart();
+      
+          } catch (err) {
+            console.error('Order creation failed:', err);
+            setErrorMsg('Failed to save order. Please contact support.');
+          }
+        }
+      
       }
     } catch (error) {
       if (error.response) {

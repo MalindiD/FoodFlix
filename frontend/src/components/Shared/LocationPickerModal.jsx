@@ -11,8 +11,21 @@ const LocationPickerModal = ({ isOpen, onClose, onSelect }) => {
         <h2 className="text-xl font-bold mb-4 text-center text-[#ec5834]">Select Delivery Location</h2>
         <LocationAutocomplete
           onSelect={(place) => {
+            console.log("Selected place:", place);
+
+            // Verify place has lat/lon
+            if (place.lat && place.lon) {
+              localStorage.setItem('userLocationCoords', JSON.stringify({
+                lat: parseFloat(place.lat),
+                lng: parseFloat(place.lon)
+              }));
+            } else {
+              console.error("Missing coordinates in selected place");
+            }
+
             onSelect(place.display_name);
             onClose();
+            localStorage.setItem('userLocation', place.display_name);
           }}
         />
         <button

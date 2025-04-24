@@ -44,6 +44,11 @@ const DeliveryDetailsPage = () => {
   };
   
   const handlePayNow = () => {
+    const coords = localStorage.getItem('userLocationCoords');
+    if (!coords) {
+      alert("Please select a delivery location before proceeding");
+      return;
+    }
     // Save all details to localStorage for the checkout page
     localStorage.setItem('orderTotal', total.toString());
     localStorage.setItem('deliveryFee', deliveryFee.toString());
@@ -121,11 +126,11 @@ const DeliveryDetailsPage = () => {
         <p>Card Payment</p>
         </div>
       </div>
-      <button 
+      {/* <button 
           className="text-orange-500"
         >
           Edit
-        </button>
+        </button> */}
       </div>
       
       {/* Order Summary */}

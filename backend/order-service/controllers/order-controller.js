@@ -3,7 +3,6 @@ const Order = require('../models/CustomerOrders');
 const axios = require('axios');
 // const config = require('../config');
 const RESTAURANT_SERVICE_URL = process.env.RESTAURANT_SERVICE_URL;
-// const { publishToQueue } = require('../utils/messageQueue');
 
 // Create a new order
 exports.createOrder = async (req, res) => {
@@ -44,25 +43,6 @@ exports.createOrder = async (req, res) => {
     });
 
     const savedOrder = await newOrder.save();
-
-    // ✅ Publish to queues (optional)
-    try {
-      await publishToQueue('restaurant_notifications', {
-        type: 'NEW_ORDER',
-        orderId: savedOrder._id,
-        restaurantId,
-        items
-      });
-
-      await publishToQueue('customer_notifications', {
-        type: 'ORDER_PLACED',
-        customerId,
-        orderId: savedOrder._id,
-        orderStatus: 'Pending'
-      });
-    } catch (error) {
-      console.error('Error publishing to queue:', error.message);
-    }
 
     res.status(201).json(savedOrder);
   } catch (error) {
@@ -131,26 +111,6 @@ exports.updateOrderStatus = async (req, res) => {
     const previousStatus = order.status;
     order.status = status;
     await order.save();
-    
-    // Notify customer about status change
-    await publishToQueue('customer_notifications', {
-      type: 'ORDER_STATUS_CHANGED',
-      customerId: order.customerId,
-      orderId: order._id,
-      previousStatus,
-      newStatus: status
-    });
-    
-    // If status is "Out for Delivery", notify Delivery Service
-    if (status === 'Out for Delivery') {
-      await publishToQueue('delivery_assignments', {
-        type: 'NEW_DELIVERY',
-        orderId: order._id,
-        restaurantId: order.restaurantId,
-        customerId: order.customerId,
-        deliveryAddress: order.deliveryAddress
-      });
-    }
     
     res.json(order);
   } catch (error) {
@@ -222,57 +182,3 @@ exports.getRestaurantOrders = async (req, res) => {
     res.status(500).json({ message: 'Error fetching restaurant orders' });
   }
 };
-
-// Update payment status
-// exports.updatePaymentStatus = async (req, res) => {
-//   try {
-//     const { paymentStatus } = req.body;
-    
-//     // Validate payment status
-//     const validStatuses = ['Pending', 'Completed', 'Failed'];
-//     if (!validStatuses.includes(paymentStatus)) {
-//       return res.status(400).json({ message: 'Invalid payment status' });
-//     }
-    
-//     const order = await Order.findById(req.params.id);
-    
-//     if (!order) {
-//       return res.status(404).json({ message: 'Order not found' });
-//     }
-    
-//     // Only payment service or admin should update payment status
-//     if (req.user.role !== 'payment' && req.user.role !== 'admin') {
-//       return res.status(403).json({ message: 'Not authorized' });
-//     }
-    
-//     order.paymentStatus = paymentStatus;
-//     await order.save();
-    
-//     // If payment completed successfully, update order status to Confirmed
-//     if (paymentStatus === 'Completed' && order.status === 'Pending') {
-//       order.status = 'Confirmed';
-//       await order.save();
-      
-//       // Notify restaurant about confirmed order
-//       await publishToQueue('restaurant_notifications', {
-//         type: 'ORDER_CONFIRMED',
-//         orderId: order._id,
-//         restaurantId: order.restaurantId
-//       });
-      
-//       // Notify customer about confirmed order
-//       await publishToQueue('customer_notifications', {
-//         type: 'ORDER_STATUS_CHANGED',
-//         customerId: order.customerId,
-//         orderId: order._id,
-//         previousStatus: 'Pending',
-//         newStatus: 'Confirmed'
-//       });
-//     }
-    
-//     res.json(order);
-//   } catch (error) {
-//     console.error('Error updating payment status:', error);
-//     res.status(500).json({ message: 'Error updating payment status' });
-//   }
-// };
