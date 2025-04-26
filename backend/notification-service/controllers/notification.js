@@ -1,76 +1,75 @@
-const emailService = require('../utils/emailService');
 const Notification = require('../models/Notification');
-const asyncHandler = require('../utils/async');
-const ErrorResponse = require('../utils/errorResponse');
-const smsService = require('../utils/smsService');
+const { sendEmail } = require('../utils/emailService');
+const { sendSMS } = require('../utils/smsService');
 
-exports.sendNotification = asyncHandler(async (req, res, next) => {
-  const {
-    userId,
-    type = 'email',
-    channel,
-    title,
-    message,
-    template,
-    templateData,
-    recipient = {},
-    metadata = {}
-  } = req.body;
-
-  // Validate required fields
-  if (!userId) {
-    return next(new ErrorResponse('User ID is required', 400));
-  }
-
-  // Ensure recipient is properly formatted
-  if (type === 'email' && !recipient.email) {
-    return next(new ErrorResponse('Recipient email is required for email notifications', 400));
-  }
+// Generic notification sender (email, sms or both)
+exports.sendNotification = async (req, res) => {
+  const { userId, type, channel, title, message, metadata = {} } = req.body;
 
   try {
-    // Explicitly check method existence
-    if (typeof emailService.generateEmailContent !== 'function') {
-      throw new Error('Email content generation method is not available');
-    }
-
-    // Generate HTML content
-    const html = emailService.generateEmailContent(template, templateData);
-
-    // Create notification record
+    // Create and store notification in DB
     const notification = await Notification.create({
       userId,
       type,
       channel,
       title,
       message,
-      metadata: {
-        ...metadata,
-        template,
-        recipient
-      }
+      metadata,
     });
 
-    // Send email
-    const emailResult = await emailService.sendEmail(
-      recipient.email,
-      title,
-      message,
-      html
-    );
+    // Send Email if needed
+    if ((type === 'email' || type === 'both') && metadata.email) {
+      await sendEmail(metadata.email, title, message);
+    }
 
-    // Update notification status
-    notification.status = emailResult.success ? 'sent' : 'failed';
+    // Send SMS if needed
+    if ((type === 'sms' || type === 'both') && metadata.phone) {
+      await sendSMS(metadata.phone, message);
+    }
+
+    // Update status to sent
+    notification.status = 'sent';
     await notification.save();
 
-    // Respond with result
-    res.status(200).json({
-      success: emailResult.success,
-      data: notification,
-      emailResult
-    });
-
-  } catch (error) {
-    console.error('Notification send error:', error);
-    return next(new ErrorResponse(`Failed to send notification: ${error.message}`, 500));
+    res.status(200).json({ success: true, data: notification });
+  } catch (err) {
+    console.error('❌ Error sending notification:', err);
+    res.status(500).json({ success: false, message: 'Failed to send notification' });
   }
-});
+};
+
+// Order notification shortcut
+exports.sendOrderNotification = async (req, res) => {
+  req.body.channel = 'order';
+  req.body.title = 'Order Update';
+  exports.sendNotification(req, res);
+};
+
+// Payment notification shortcut
+exports.sendPaymentNotification = async (req, res) => {
+  req.body.channel = 'payment';
+  req.body.title = 'Payment Status';
+  exports.sendNotification(req, res);
+};
+
+// Get all notifications for a specific user
+exports.getUserNotifications = async (req, res) => {
+  try {
+    const notifications = await Notification.find({ userId: req.params.userId }).sort({ createdAt: -1 });
+    res.status(200).json({ success: true, count: notifications.length, data: notifications });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Failed to fetch notifications' });
+  }
+};
+
+// Admin: fetch all notifications
+exports.getAllNotifications = async (req, res) => {
+  try {
+    const notifications = await Notification.find().sort({ createdAt: -1 });
+    res.status(200).json({ success: true, count: notifications.length, data: notifications });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Failed to fetch all notifications' });
+  }
+};

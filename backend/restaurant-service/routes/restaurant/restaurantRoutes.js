@@ -23,6 +23,24 @@ router.get("/:id", restaurantController.getRestaurantById);
 
 // Nested routes LAST
 router.use("/menu-items", menuItemRoutes); 
+// ✅ Check restaurant availability by ID
+router.get("/:id/status", async (req, res) => {
+  try {
+    const Restaurant = require("../../models/restaurant/Restaurant"); // ✅ Correct path
+   const restaurant = await Restaurant.findById(req.params.id);
+
+    if (!restaurant) {
+      return res.status(404).json({ message: "Restaurant not found" });
+    }
+
+    res.status(200).json({ isAvailable: restaurant.isAvailable });
+  } catch (err) {
+    console.error("Error checking restaurant availability:", err.message);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+ 
+// Nested routes
 router.use("/:restaurantId/menu-items", menuItemRoutes);
 router.use("/:restaurantId/orders", orderRoutes);
 

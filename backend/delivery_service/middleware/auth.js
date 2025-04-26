@@ -1,6 +1,7 @@
 // delivery_service/middleware/auth.js
 const jwt = require("jsonwebtoken");
 
+// ✅ Protect middleware to verify JWT
 const protect = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
@@ -12,11 +13,24 @@ const protect = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // includes { id }
+    req.user = decoded;
     next();
   } catch (err) {
-    res.status(401).json({ message: "Invalid or expired token" });
+    return res.status(403).json({ message: "Invalid or expired token" });
   }
 };
 
-module.exports = protect;
+// ✅ Role-based middleware (for future use if needed)
+const authorize = (...roles) => {
+  return (req, res, next) => {
+    if (!req.user || !roles.includes(req.user.role)) {
+      return res.status(403).json({ message: 'Access denied: insufficient role' });
+    }
+    next();
+  };
+};
+
+module.exports = {
+  protect,
+  authorize
+};

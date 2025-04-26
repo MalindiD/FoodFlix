@@ -1,52 +1,23 @@
-// utils/emailService.js
 const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY); // Make sure this is in your .env
 
-// Explicitly define the functions outside the module.exports
-function generateEmailContent(template, templateData) {
-  console.log('Generating email content', { template, templateData });
-  
-  // Default fallback template
-  if (!template) {
-    return `
-      <html>
-        <body>
-          <h1>${(templateData && templateData.title) || 'Notification'}</h1>
-          <p>${(templateData && templateData.message) || 'No additional details provided'}</p>
-        </body>
-      </html>
-    `;
-  }
+async function sendEmail(to, subject, text, html = null) {
+  const msg = {
+    to,
+    from: process.env.EMAIL_FROM, // ✅ FIXED: should be a verified sender
+    subject,
+    text,
+    html: html || `<p>${text}</p>`,
+  };
 
-  // Add specific template handling
-  switch(template) {
-    case 'order-confirmation':
-      return `
-        <html>
-          <body>
-            <h1>Order Confirmation</h1>
-            <p>Order #${(templateData && templateData.orderId) || 'N/A'} has been confirmed.</p>
-          </body>
-        </html>
-      `;
-    default:
-      return `
-        <html>
-          <body>
-            <h1>${template}</h1>
-            <p>${JSON.stringify(templateData)}</p>
-          </body>
-        </html>
-      `;
+  try {
+    await sgMail.send(msg);
+    console.log('✅ Email sent to:', to);
+    return { success: true };
+  } catch (error) {
+    console.error('❌ Email send failed:', error.response?.body || error.message);
+    return { success: false, error: error.message };
   }
 }
 
-async function sendEmail(to, subject, text, html) {
-  console.log('Sending email:', { to, subject, text, html });
-  return { success: true, development: true };
-}
-
-// Export the functions directly
-module.exports = {
-  generateEmailContent,
-  sendEmail
-};
+module.exports = { sendEmail };

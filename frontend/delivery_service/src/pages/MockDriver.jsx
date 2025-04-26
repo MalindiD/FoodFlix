@@ -6,13 +6,13 @@ const socket = io("http://localhost:5003");
 
 const MockDriver = () => {
   useEffect(() => {
-    let lat = 8.3497;
-    let lng = 80.3958;
-
+    let lat = 6.9157;
+    let lng =  79.863;
+    
     const interval = setInterval(() => {
       lat += 0.0005; // simulate visible movement
       socket.emit("locationUpdate", {
-        orderId: "ORD2222", // must match the real orderId
+        orderId: "6804ce9e73fc6495389ee139", // must match the real orderId
         location: { lat, lng }
       });
       console.log("Sent new location:", lat, lng);

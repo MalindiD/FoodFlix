@@ -1,53 +1,71 @@
-// server.js
 const express = require('express');
+const http = require('http');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
+const socketio = require('socket.io');
 const connectDB = require('./config/db');
 const errorHandler = require('./middleware/error');
 
-
+// Load env variables
 dotenv.config();
 connectDB();
 
-// Route files
-const notifications = require('./routes/notification');
-
 const app = express();
+const server = http.createServer(app);
 
-// Body parser
+// Socket.IO setup
+const io = socketio(server, {
+  cors: {
+    origin: process.env.CLIENT_URL || 'http://localhost:3000',
+    methods: ['GET', 'POST'],
+    credentials: true
+  }
+});
+
+app.set('io', io);
+
+// Middleware
 app.use(express.json());
-
-// Cookie parser
 app.use(cookieParser());
-
-// Dev logging middleware
-if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV !== 'production') {
   app.use(morgan('dev'));
 }
 
-// Enable CORS
 app.use(cors({
   origin: process.env.CLIENT_URL || 'http://localhost:3000',
   credentials: true
 }));
 
 // Mount routes
-app.use('/api/notifications', notifications);
+app.use('/api/notifications', require('./routes/notification'));
 
 // Error handler
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
+// Socket.IO Events
+io.on('connection', (socket) => {
+  console.log(`📡 Delivery client connected: ${socket.id}`);
 
-const server = app.listen(PORT, () => {
-  console.log(`Notification service running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+  socket.on('joinRoom', (deliveryPartnerId) => {
+    socket.join(deliveryPartnerId);
+    console.log(`🚚 Partner joined room: ${deliveryPartnerId}`);
+  });
+
+  socket.on('disconnect', () => {
+    console.log(`🔌 Delivery client disconnected: ${socket.id}`);
+  });
 });
 
-// Handle unhandled promise rejections
-process.on('unhandledRejection', (err, promise) => {
-  console.log(`Error: ${err.message}`);
-  // Close server & exit process
+// Start server
+const PORT = process.env.PORT || 5001;
+server.listen(PORT, () => {
+  console.log(`🚀 Notification service running on port ${PORT} in ${process.env.NODE_ENV} mode`);
+});
+
+// Graceful exit
+process.on('unhandledRejection', (err) => {
+  console.error(`💥 Unhandled Rejection: ${err.message}`);
   server.close(() => process.exit(1));
 });
