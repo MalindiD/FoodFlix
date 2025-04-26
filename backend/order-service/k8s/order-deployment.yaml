@@ -32,7 +32,7 @@ spec:
                   name: jwt-secret
                   key: jwt-secret
             - name: RESTAURANT_SERVICE_URL
-              value: "http://restaurant-service:5001"
+              value: "http://restaurant-service:5000"
             - name: DELIVERY_SERVICE_URL
               value: "http://delivery-service:5003"
             - name: NOTIFICATION_SERVICE_URL
