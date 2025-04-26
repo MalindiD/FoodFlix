@@ -39,7 +39,7 @@ spec:
         - name: JWT_SECRET
           valueFrom:
             secretKeyRef:
-              name: mongodb-secret
+              name: payment-secrets   
               key: jwt-secret
         - name: JWT_EXPIRE
           value: "30d"
@@ -48,10 +48,12 @@ spec:
         - name: NOTIFICATION_SERVICE_URL
           value: "http://notification-service:5000"
         - name: CLIENT_URL
-          value: "http://frontend:3000"
+          value: "http://frontend:3001"
         - name: API_URL
           value: "http://payment-service:3000"
-        # Stripe configurations
+        - name: CORS_ALLOW_ORIGIN
+          value: "*" 
+        # Stripe configuration
         - name: STRIPE_SECRET_KEY
           valueFrom:
             secretKeyRef:

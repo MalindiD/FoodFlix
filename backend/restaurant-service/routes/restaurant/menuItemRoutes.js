@@ -9,11 +9,11 @@ const upload = require("../../middleware/multerConfig");
 router.post("/", upload.single("image"), menuItemController.createMenuItem);
 
 router.get("/", menuItemController.getMenuItems);
+router.get("/categories/unique", menuItemController.getUniqueCategories);
+router.get("/all-categories", menuItemController.getUniqueCategories); 
 router.get("/:id", menuItemController.getMenuItemById);
+router.get("/tags/unique", menuItemController.getUniqueTags);
 router.patch("/:id", upload.single("image"), menuItemController.updateMenuItem);
-
-router.patch("/:id", upload.single("image"), menuItemController.updateMenuItem);
-
 router.delete("/:id", menuItemController.deleteMenuItem);
 router.patch(
   "/:id/availability",

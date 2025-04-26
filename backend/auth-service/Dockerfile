@@ -1,22 +1,23 @@
 FROM node:18-alpine
 
+# Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json
+# Copy dependency definitions
 COPY package*.json ./
 
-# Install dependencies
+# Install production dependencies
 RUN npm install --production
 
-# Copy source code
+# Copy the entire application code (including config folder)
 COPY . .
 
 # Set environment variables
 ENV NODE_ENV=production
 ENV PORT=3000
 
-# Expose the port
+# Expose API port
 EXPOSE 3000
 
-# Command to run the application
+# Run the server
 CMD ["node", "server.js"]

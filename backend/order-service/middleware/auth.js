@@ -20,7 +20,7 @@ exports.protect = asyncHandler(async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log('[JWT DECODED]', decoded); // ✅ add this
+    // console.log('[JWT DECODED]', decoded); // ✅ add this
 
 
     req.user = {
@@ -28,7 +28,7 @@ exports.protect = asyncHandler(async (req, res, next) => {
       role: decoded.role
     };
 
-    console.log('[TOKEN VERIFIED] User:', req.user); // 👈 Add this
+    // console.log('[TOKEN VERIFIED] User:', req.user); // 👈 Add this
 
     next();
   } catch (err) {

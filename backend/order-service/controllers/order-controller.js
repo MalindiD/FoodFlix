@@ -10,18 +10,29 @@ exports.createOrder = async (req, res) => {
     const { restaurantId, items, totalAmount, deliveryAddress } = req.body;
     const customerId = req.user.id;
 
-    // ✅ Check restaurant availability
-    try {
-      const restaurantResponse = await axios.get(`${RESTAURANT_SERVICE_URL}/api/restaurants/${restaurantId}/status`);
-      if (!restaurantResponse.data.isAvailable) {
-        return res.status(400).json({ message: 'Restaurant is currently unavailable' });
-      }
-    } catch (error) {
-      console.error('Error checking restaurant availability:', error);
-      return res.status(500).json({ message: 'Could not verify restaurant availability' });
+    // ✅ Verify restaurant
+    const restaurantRes = await axios.get(`${RESTAURANT_SERVICE_URL}/api/restaurants/${restaurantId}`);
+    const restaurant = restaurantRes.data;
+
+    if (!restaurant || !restaurant.isAvailable) {
+      return res.status(400).json({ message: 'Restaurant is not available' });
     }
 
-    // ✅ Create and save new order
+    // ✅ Verify menu items
+    for (const item of items) {
+      try {
+        const res = await axios.get(`${RESTAURANT_SERVICE_URL}/api/restaurants/${restaurantId}/menu-items/${item.menuItemId}`);
+        const menuItem = res.data;
+
+        if (!menuItem || !menuItem.isAvailable) {
+          return res.status(400).json({ message: `Menu item '${item.name}' is not available.` });
+        }
+      } catch (err) {
+        return res.status(400).json({ message: `Failed to verify menu item '${item.name}'` });
+      }
+    }
+
+    // ✅ Save order
     const newOrder = new Order({
       customerId,
       restaurantId,
@@ -47,10 +58,11 @@ exports.createOrder = async (req, res) => {
 
     res.status(201).json(savedOrder);
   } catch (error) {
-    console.error('Error creating order:', error);
+    console.error('❌ Error creating order:', error.message);
     res.status(500).json({ message: 'Error creating order' });
   }
 };
+
 
 // Get all orders for a customer
 exports.getCustomerOrders = async (req, res) => {
@@ -102,7 +114,7 @@ exports.updateOrderStatus = async (req, res) => {
 
     order.status = status;
     await order.save();
-
+    
     res.json(order);
   } catch (error) {
     console.error('Error updating order status:', error);

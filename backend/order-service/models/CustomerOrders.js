@@ -42,11 +42,6 @@ const CustomerOrderSchema = new mongoose.Schema({
     enum: ['Pending', 'Confirmed', 'Preparing', 'Out for Delivery', 'Delivered', 'Cancelled'],
     default: 'Pending'
   },
-  paymentStatus: {
-    type: String,
-    enum: ['Pending', 'Completed', 'Failed'],
-    default: 'Pending'
-  },
   createdAt: {
     type: Date,
     default: Date.now

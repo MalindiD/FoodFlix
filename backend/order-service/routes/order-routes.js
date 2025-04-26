@@ -21,7 +21,4 @@ router.patch('/:id/cancel', protect, orderController.cancelOrder);
 // Get restaurant orders
 router.get('/restaurant/orders', protect, authorize('restaurant'), orderController.getRestaurantOrders);
 
-// Update payment status
-router.patch('/:id/payment', protect, authorize('payment', 'admin'), orderController.updatePaymentStatus);
-
 module.exports = router;

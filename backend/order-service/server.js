@@ -40,7 +40,7 @@ const setupMessageConsumers = async () => {
           const order = await Order.findById(orderId);
           
           if (order) {
-            order.paymentStatus = status;
+            // order.paymentStatus = status;
             
             // If payment completed, update order status to Confirmed
             if (status === 'Completed' && order.status === 'Pending') {

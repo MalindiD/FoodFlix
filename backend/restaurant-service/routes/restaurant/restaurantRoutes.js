@@ -5,10 +5,13 @@ const menuItemRoutes = require("./menuItemRoutes");
 const orderRoutes = require("./orderRoutes");
 const upload = require("../../middleware/multerConfig");
 
-// Restaurant routes
+// Static & Specific routes FIRST
 router.get("/", restaurantController.getAllRestaurants);
-router.get("/:id", restaurantController.getRestaurantById);
+router.get("/filter", restaurantController.filterByCategoryOrTag);
+router.get("/search", restaurantController.searchRestaurants);
 router.post("/", restaurantController.createRestaurant);
+
+// CRUD routes using :id NEXT
 router.put(
   "/:id",
   upload.single("profileImage"),
@@ -16,25 +19,10 @@ router.put(
 );
 router.delete("/:id", restaurantController.deleteRestaurant);
 router.patch("/:id/availability", restaurantController.updateAvailability);
+router.get("/:id", restaurantController.getRestaurantById);
 
-// ✅ Check restaurant availability by ID
-router.get("/:id/status", async (req, res) => {
-  try {
-    const Restaurant = require("../../models/restaurant/Restaurant"); // ✅ Correct path
-   const restaurant = await Restaurant.findById(req.params.id);
-
-    if (!restaurant) {
-      return res.status(404).json({ message: "Restaurant not found" });
-    }
-
-    res.status(200).json({ isAvailable: restaurant.isAvailable });
-  } catch (err) {
-    console.error("Error checking restaurant availability:", err.message);
-    res.status(500).json({ message: "Internal server error" });
-  }
-});
- 
-// Nested routes
+// Nested routes LAST
+router.use("/menu-items", menuItemRoutes); 
 router.use("/:restaurantId/menu-items", menuItemRoutes);
 router.use("/:restaurantId/orders", orderRoutes);
 

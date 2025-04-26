@@ -18,6 +18,7 @@ const {
 
 const { protect, authorize } = require('../middleware/auth');
 
+
 // Public routes
 router.post('/register', register);
 router.post('/login', login);
