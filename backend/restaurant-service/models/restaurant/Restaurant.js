@@ -45,10 +45,13 @@ const RestaurantSchema = new mongoose.Schema({
     required: true
   },
 
-  // ✅ New optional field for profile image upload
   profileImage: {
     type: String,
     default: ""
+  },
+  isVerified: {
+    type: Boolean,
+    default: false
   }
 });
 

@@ -1,5 +1,5 @@
 const Restaurant = require("../../models/restaurant/Restaurant");
-
+const Order = require("../../models/Order");
 // Get all restaurants
 exports.getAllRestaurants = async (req, res) => {
   try {
@@ -107,5 +107,40 @@ exports.updateAvailability = async (req, res) => {
     res
       .status(400)
       .json({ message: "Error updating availability", error: error.message });
+  }
+};
+
+//Verify Restaurant
+exports.verifyRestaurant = async (req, res) => {
+  try {
+    const restaurant = await Restaurant.findByIdAndUpdate(
+      req.params.id,
+      { isVerified: true },
+      { new: true }
+    );
+    if (!restaurant) return res.status(404).json({ message: "Not found" });
+    res.json(restaurant);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Verification failed", error: error.message });
+  }
+};
+
+exports.markOrderAsPaid = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const order = await Order.findById(orderId);
+    if (!order) return res.status(404).json({ message: "Order not found" });
+
+    order.paymentStatus = "Paid";
+    order.paidAt = new Date();
+    await order.save();
+
+    res.status(200).json({ message: "Order marked as paid", order });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Failed to mark order as paid", error: error.message });
   }
 };
