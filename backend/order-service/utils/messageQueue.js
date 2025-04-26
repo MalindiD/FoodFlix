@@ -3,41 +3,45 @@ const amqp = require('amqplib');
 const config = require('../config/db');
 
 let channel = null;
+let isConnected = false;
 
-// Connect to RabbitMQ and create a channel
+// Try to connect to RabbitMQ and create a channel
 const connectQueue = async () => {
   try {
     const connection = await amqp.connect(config.RABBITMQ_URL);
     channel = await connection.createChannel();
-    
+
     // Declare queues
     await channel.assertQueue('restaurant_notifications', { durable: true });
     await channel.assertQueue('customer_notifications', { durable: true });
     await channel.assertQueue('delivery_assignments', { durable: true });
-    
-    console.log('Connected to RabbitMQ');
+
+    console.log('✅ Connected to RabbitMQ');
+    isConnected = true;
     return channel;
   } catch (error) {
-    console.error('Error connecting to RabbitMQ:', error);
-    process.exit(1);
+    console.warn('⚠️ RabbitMQ not available. Skipping message queue setup for now.');
+    isConnected = false;
   }
 };
 
-// Publish message to queue
+// Safely publish to queue only if connected
 const publishToQueue = async (queue, message) => {
   try {
-    if (!channel) await connectQueue();
+    if (!channel && !isConnected) await connectQueue();
+    if (!isConnected) return console.warn(`⚠️ Skipped publishing to ${queue}: MQ not connected`);
     return channel.sendToQueue(queue, Buffer.from(JSON.stringify(message)), { persistent: true });
   } catch (error) {
-    console.error(`Error publishing to queue ${queue}:`, error);
-    throw error;
+    console.error(`Error publishing to queue ${queue}:`, error.message);
   }
 };
 
-// Consume messages from queue
+// Safely consume from queue only if connected
 const consumeFromQueue = async (queue, callback) => {
   try {
-    if (!channel) await connectQueue();
+    if (!channel && !isConnected) await connectQueue();
+    if (!isConnected) return console.warn(`⚠️ Skipped consuming ${queue}: MQ not connected`);
+
     await channel.assertQueue(queue, { durable: true });
     channel.consume(queue, (message) => {
       if (message !== null) {
@@ -47,8 +51,7 @@ const consumeFromQueue = async (queue, callback) => {
       }
     });
   } catch (error) {
-    console.error(`Error consuming from queue ${queue}:`, error);
-    throw error;
+    console.error(`Error consuming from queue ${queue}:`, error.message);
   }
 };
 
