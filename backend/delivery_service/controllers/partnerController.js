@@ -16,10 +16,10 @@ exports.registerPartner = async (req, res) => {
       profileImage
     } = req.body;
 
-    const existing = await DeliveryPartner.findOne({ phone });
+   /* const existing = await DeliveryPartner.findOne({ phone });
     if (existing) {
       return res.status(409).json({ message: 'Partner already exists with this phone' });
-    }
+    }*/
 
     const newPartner = new DeliveryPartner({
       name,
