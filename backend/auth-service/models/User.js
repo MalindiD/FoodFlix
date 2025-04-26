@@ -32,7 +32,14 @@ const UserSchema = new mongoose.Schema({
   },
   phone: {
     type: String,
-    required: [true, 'Please provide a phone number']
+    required: [true, 'Please provide a phone number'],
+    validate: {
+      validator: function(v) {
+        // Enforce E.164 format
+        return /^\+[1-9]\d{1,14}$/.test(v);
+      },
+      message: props => `${props.value} is not a valid E.164 phone number!`
+    }
   },
   address: {
     type: String,

@@ -3,6 +3,8 @@ const axios = require('axios');
 
 const RESTAURANT_SERVICE_URL = process.env.RESTAURANT_SERVICE_URL;
 const DELIVERY_SERVICE_URL = process.env.DELIVERY_SERVICE_URL;
+const AUTH_SERVICE_URL = process.env.AUTH_SERVICE_URL;
+const NOTIFICATION_SERVICE_URL = process.env.NOTIFICATION_SERVICE_URL;
 
 // Create a new order
 exports.createOrder = async (req, res) => {
@@ -55,6 +57,48 @@ exports.createOrder = async (req, res) => {
     });
 
     const savedOrder = await newOrder.save();
+
+    try {
+
+      const jwt = require('jsonwebtoken');
+      const serviceToken = jwt.sign(
+        { id: 'order-service', role: 'system' ,service: true},
+        process.env.JWT_SECRET,
+        { expiresIn: '10m' }
+      );
+      console.log('[🔑 SERVICE TOKEN]', serviceToken);
+
+
+      // Fetch customer details
+      const authRes = await axios.get(
+        `${AUTH_SERVICE_URL}/api/auth/users/${customerId}`,
+        { headers: { Authorization: `Bearer ${serviceToken}`} }
+      );
+      const customer = authRes.data.data;
+    
+      // Send notification
+      await axios.post(
+        `${NOTIFICATION_SERVICE_URL}/api/notifications`,
+        {
+          userId: customer._id,
+          type: 'both',
+          channel: 'order',
+          title: 'Order Placed Successfully',
+          message: `Hi ${customer.name}, your order #${savedOrder._id} has been placed successfully!`,
+          metadata: {
+            email: customer.email,
+            phone: customer.phone,
+            orderId: savedOrder._id
+          }
+        },
+        {
+          headers: { Authorization: `Bearer ${serviceToken}` }
+        }
+      );
+      console.log('✅ Order confirmation notification sent to customer.');
+    } catch (notifErr) {
+      console.error('❌ Failed to send order confirmation notification:', notifErr.message);
+    }
 
     // ✅ Trigger delivery assignment
     try {
