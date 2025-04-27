@@ -1,5 +1,6 @@
 const Restaurant = require("../../models/restaurant/Restaurant");
-const Order = require("../../models/Order");
+const CustomerOrder = require("../../models/CustomerOrders");
+
 // Get all restaurants
 exports.getAllRestaurants = async (req, res) => {
   try {
@@ -40,7 +41,7 @@ exports.createRestaurant = async (req, res) => {
   }
 };
 
-// Update restaurant
+// Update restaurant (with profile image handling)
 exports.updateRestaurant = async (req, res) => {
   console.log("BODY:", req.body);
   console.log("FILE:", req.file);
@@ -110,7 +111,7 @@ exports.updateAvailability = async (req, res) => {
   }
 };
 
-//Verify Restaurant
+// Verify restaurant
 exports.verifyRestaurant = async (req, res) => {
   try {
     const restaurant = await Restaurant.findByIdAndUpdate(
@@ -118,7 +119,8 @@ exports.verifyRestaurant = async (req, res) => {
       { isVerified: true },
       { new: true }
     );
-    if (!restaurant) return res.status(404).json({ message: "Not found" });
+    if (!restaurant)
+      return res.status(404).json({ message: "Restaurant not found" });
     res.json(restaurant);
   } catch (error) {
     res
@@ -127,10 +129,11 @@ exports.verifyRestaurant = async (req, res) => {
   }
 };
 
+// Mark an order as paid
 exports.markOrderAsPaid = async (req, res) => {
   try {
     const { orderId } = req.params;
-    const order = await Order.findById(orderId);
+    const order = await CustomerOrder.findById(orderId);
     if (!order) return res.status(404).json({ message: "Order not found" });
 
     order.paymentStatus = "Paid";

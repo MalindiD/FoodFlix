@@ -24,7 +24,7 @@ const PaymentDetailsModal = ({ order, payment, onClose }) => {
             <p>
               <strong>Amount:</strong>{" "}
               {payment.amount !== undefined
-                ? `$${payment.amount.toFixed(2)}`
+                ? `Rs.${payment.amount.toFixed(2)}`
                 : "-"}
             </p>
             <p>
@@ -62,7 +62,7 @@ const PaymentDetailsModal = ({ order, payment, onClose }) => {
             <p>
               <strong>Total Price:</strong>{" "}
               {order.totalPrice !== undefined
-                ? `$${order.totalPrice.toFixed(2)}`
+                ? `Rs.${order.totalPrice.toFixed(2)}`
                 : "-"}
             </p>
             {order.specialInstructions && (
@@ -84,7 +84,7 @@ const PaymentDetailsModal = ({ order, payment, onClose }) => {
               <ul className="list-disc ml-6 space-y-1">
                 {order.items.map((item, index) => (
                   <li key={index}>
-                    {item.name} — {item.quantity} × $
+                    {item.name} — {item.quantity} × Rs.
                     {item.price?.toFixed(2) || "0.00"}
                   </li>
                 ))}

@@ -7,7 +7,7 @@ const renderOrdersTable = (
   formatDate,
   getStatusColor,
   onOrderClick,
-  markAsPaid // ✅ Added to parameters
+  markAsPaid
 ) => (
   <div className="bg-white shadow-md rounded-lg overflow-hidden">
     <table className="min-w-full divide-y divide-gray-200">
@@ -60,7 +60,7 @@ const renderOrdersTable = (
               </div>
             </td>
             <td className="px-6 py-4 text-sm font-medium text-gray-900">
-              ${order.totalPrice?.toFixed(2) || "0.00"}
+              Rs.{order.totalPrice?.toFixed(2) || "0.00"}
             </td>
             <td className="px-6 py-4">
               <span
@@ -122,6 +122,7 @@ const renderOrdersTable = (
                   </button>
                 </>
               )}
+
               {order.status?.toLowerCase() === "confirmed" && (
                 <button
                   onClick={(e) => {
@@ -133,18 +134,20 @@ const renderOrdersTable = (
                   Start Preparing
                 </button>
               )}
+
               {order.status?.toLowerCase() === "preparing" && (
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleUpdateStatus(order._id, "Ready");
+                    handleUpdateStatus(order._id, "Cooking");
                   }}
                   className="text-green-600 hover:text-green-900 block"
                 >
-                  Mark Ready
+                  Start Cooking
                 </button>
               )}
-              {order.status?.toLowerCase() === "ready" && (
+
+              {order.status?.toLowerCase() === "cooking" && (
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -155,11 +158,12 @@ const renderOrdersTable = (
                   Send for Delivery
                 </button>
               )}
+
               {order.status?.toLowerCase() === "out for delivery" && (
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleUpdateStatus(order._id, "Completed");
+                    handleUpdateStatus(order._id, "Delivered");
                   }}
                   className="text-gray-600 hover:text-gray-900 block"
                 >

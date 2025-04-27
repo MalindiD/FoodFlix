@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import AdminLayout from "../components/Admin/AdminLayout";
+import AdminPaymentDetailsModal from "../components/Admin/AdminPaymentDetailsModal";
 
 const AdminFinancialsPage = () => {
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
+  const [selectedPayment, setSelectedPayment] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchAllPayments = async () => {
@@ -50,7 +53,7 @@ const AdminFinancialsPage = () => {
           <div className="bg-white shadow-md rounded-lg p-6 w-full md:w-1/2">
             <p className="text-gray-500 text-sm mb-2">Total Revenue</p>
             <p className="text-2xl font-semibold text-green-600">
-              ${totalRevenue.toFixed(2)}
+              Rs.{totalRevenue.toFixed(2)}
             </p>
           </div>
 
@@ -86,7 +89,7 @@ const AdminFinancialsPage = () => {
             <table className="min-w-full text-sm text-gray-700">
               <thead className="bg-gray-100">
                 <tr>
-                  <th className="p-4 text-left font-semibold">Restaurant</th>
+                  <th className="p-4 text-left font-semibold">Order ID</th>
                   <th className="p-4 text-left font-semibold">Amount</th>
                   <th className="p-4 text-left font-semibold">Method</th>
                   <th className="p-4 text-left font-semibold">Status</th>
@@ -99,13 +102,32 @@ const AdminFinancialsPage = () => {
                 {filteredPayments.map((payment) => (
                   <tr
                     key={payment._id}
-                    className="border-t hover:bg-gray-50 transition-all"
+                    onClick={() => {
+                      setSelectedPayment(payment);
+                      setModalOpen(true);
+                    }}
+                    className="border-t hover:bg-gray-50 cursor-pointer transition-all"
                   >
-                    <td className="p-4">{payment.restaurantName || "N/A"}</td>
-                    <td className="p-4 font-medium">
-                      ${payment.amount.toFixed(2)}
+                    {/* Restaurant (Order ID shortened) */}
+                    <td className="p-4">
+                      {payment.order
+                        ? typeof payment.order === "object"
+                          ? payment.order._id?.slice(-6).toUpperCase()
+                          : payment.order.slice(-6).toUpperCase()
+                        : "N/A"}
                     </td>
-                    <td className="p-4 capitalize">{payment.paymentMethod}</td>
+
+                    {/* Amount */}
+                    <td className="p-4 font-medium">
+                      Rs.{payment.amount?.toFixed(2) || "0.00"}
+                    </td>
+
+                    {/* Payment Method */}
+                    <td className="p-4 capitalize">
+                      {payment.paymentMethod || "N/A"}
+                    </td>
+
+                    {/* Status */}
                     <td className="p-4">
                       <span
                         className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
@@ -119,11 +141,22 @@ const AdminFinancialsPage = () => {
                         {payment.status}
                       </span>
                     </td>
+
+                    {/* Transaction ID */}
                     <td className="p-4">{payment.transactionId || "-"}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
+            {modalOpen && selectedPayment && (
+              <AdminPaymentDetailsModal
+                payment={selectedPayment}
+                onClose={() => {
+                  setModalOpen(false);
+                  setSelectedPayment(null);
+                }}
+              />
+            )}
           </div>
         )}
       </div>

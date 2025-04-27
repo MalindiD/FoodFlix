@@ -32,7 +32,7 @@ const AdminOrdersPage = () => {
     fetchOrders();
   }, [id]);
 
-  // 🔥 Helper function to render colorful status badge
+  //  Helper function to render colorful status badge
   const renderStatusBadge = (status) => {
     const baseClass = "px-3 py-1 rounded-full text-xs font-semibold capitalize";
 

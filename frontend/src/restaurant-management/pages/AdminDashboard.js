@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+
 import AdminLayout from "../components/Admin/AdminLayout";
+import AdminPaymentDetailsModal from "../components/Admin/AdminPaymentDetailsModal";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -31,6 +33,8 @@ const AdminDashboard = () => {
   });
   const [recentPayments, setRecentPayments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedPayment, setSelectedPayment] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const fetchOverviewData = async () => {
     try {
@@ -237,7 +241,14 @@ const AdminDashboard = () => {
                     </thead>
                     <tbody>
                       {recentPayments.slice(0, 5).map((p) => (
-                        <tr key={p._id} className="border-t hover:bg-gray-50">
+                        <tr
+                          key={p._id}
+                          onClick={() => {
+                            setSelectedPayment(p);
+                            setModalOpen(true);
+                          }}
+                          className="border-t hover:bg-gray-50 cursor-pointer transition"
+                        >
                           <td className="px-4 py-2">
                             {p.order
                               ? typeof p.order === "string"
@@ -249,7 +260,7 @@ const AdminDashboard = () => {
                           </td>
 
                           <td className="px-4 py-2">
-                            {p.currency || "USD"} {p.amount.toFixed(2)}
+                            {p.currency || "LKR"} {p.amount.toFixed(2)}
                           </td>
 
                           <td className="px-4 py-2">
@@ -279,6 +290,15 @@ const AdminDashboard = () => {
                       ))}
                     </tbody>
                   </table>
+                  {modalOpen && selectedPayment && (
+                    <AdminPaymentDetailsModal
+                      payment={selectedPayment}
+                      onClose={() => {
+                        setModalOpen(false);
+                        setSelectedPayment(null);
+                      }}
+                    />
+                  )}
                 </div>
               )}
             </div>

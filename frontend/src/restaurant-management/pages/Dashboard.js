@@ -68,27 +68,36 @@ function Dashboard() {
 
   const handleUpdateStatus = async (orderId, newStatus) => {
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/restaurants/${restaurantId}/orders/${orderId}/status`,
-        {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ status: newStatus })
-        }
-      );
-      if (!response.ok) {
-        throw new Error("Failed to update order status");
+      const token = sessionStorage.getItem("token");
+      const storedRestaurant = sessionStorage.getItem("restaurant");
+      const restaurantId = storedRestaurant
+        ? JSON.parse(storedRestaurant).id
+        : null;
+
+      if (!restaurantId) {
+        console.error("Restaurant ID missing!");
+        return;
       }
 
-      const updatedOrder = await response.json();
-      setOrders((prevOrders) =>
-        prevOrders.map((order) =>
-          order._id === orderId ? updatedOrder : order
-        )
+      const response = await axios.patch(
+        `http://localhost:5000/api/restaurants/${restaurantId}/orders/${orderId}/status`,
+        { status: newStatus },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
       );
-    } catch (err) {
-      console.error("Error updating order:", err);
-      alert("Failed to update order status. Please try again.");
+
+      if (response.status === 200) {
+        console.log("Order status updated successfully");
+        // Optionally, refetch orders
+        fetchOrders();
+      }
+    } catch (error) {
+      console.error(
+        "Error updating order status:",
+        error.response?.data || error.message
+      );
+      alert("Failed to update order status.");
     }
   };
 
@@ -242,7 +251,7 @@ function Dashboard() {
                     <td className="p-3">{order._id.slice(0, 8)}...</td>
                     <td className="p-3">
                       {order.totalPrice !== undefined
-                        ? `$${order.totalPrice.toFixed(2)}`
+                        ? `Rs.${order.totalPrice.toFixed(2)}`
                         : "-"}
                     </td>
                     <td className="p-3 capitalize">{order.status}</td>

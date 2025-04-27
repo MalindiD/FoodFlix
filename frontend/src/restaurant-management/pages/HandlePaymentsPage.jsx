@@ -158,7 +158,7 @@ const HandlePaymentsPage = () => {
                       {payment.order?.slice(0, 8)}...
                     </td>
                     <td className="p-4 font-bold text-green-600">
-                      ${payment.amount?.toFixed(2) || "-"}
+                      Rs.{payment.amount?.toFixed(2) || "-"}
                     </td>
                     <td className="p-4 capitalize text-gray-700">
                       {payment.paymentMethod}
