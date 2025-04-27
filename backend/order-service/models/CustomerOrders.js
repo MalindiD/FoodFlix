@@ -39,7 +39,7 @@ const CustomerOrderSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['Pending', 'Confirmed', 'Preparing', 'Out for Delivery', 'Delivered', 'Cancelled'],
+    enum: ['Pending', 'Confirmed', 'Preparing', 'Cooking', 'Out for Delivery', 'Delivered', 'Cancelled'],
     default: 'Pending'
   },
   statusHistory: [
@@ -56,6 +56,19 @@ const CustomerOrderSchema = new mongoose.Schema({
   ],
   specialInstructions: {
     type: String
+  },
+  paymentStatus: {
+    type: String,
+    enum: ["Pending", "Paid", "Failed"],
+    default: "Pending"
+  },
+  paidAt: {
+    type: Date
+  },
+  paymentMethod: {
+    type: String,
+    enum: ["stripe", "paypal"],
+    default: "stripe"
   },
   createdAt: {
     type: Date,
