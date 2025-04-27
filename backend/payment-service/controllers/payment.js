@@ -111,8 +111,8 @@ exports.processPayment = asyncHandler(async (req, res, next) => {
     amount: parseFloat(amount),
     currency: currency || 'usd',
     userId: req.user.id,
-    customerName: req.body.customerName,
-    customerEmail: req.body.customerEmail
+    customerName: req.user.name,
+    customerEmail: req.user.email
   };
   
   let paymentResult;
@@ -130,7 +130,7 @@ exports.processPayment = asyncHandler(async (req, res, next) => {
     if (existingPayment) {
       payment = existingPayment;
       payment.paymentMethod = paymentMethod;
-      payment.status = 'processing';
+      payment.status = 'completed';
       payment.transactionId = paymentResult.paymentIntentId || `${paymentMethod}-${Date.now()}`;
       payment.paymentDetails = paymentResult;
       await payment.save();
@@ -141,31 +141,31 @@ exports.processPayment = asyncHandler(async (req, res, next) => {
         amount: parseFloat(amount),
         currency: currency || 'USD',
         paymentMethod,
-        status: 'processing',
+        status: 'completed',
         transactionId: paymentResult.paymentIntentId || `${paymentMethod}-${Date.now()}`,
         paymentDetails: paymentResult
       });
     }
     
     // Notify order service about payment status
-    try {
-      await axios.post(
-        `${process.env.ORDER_SERVICE_URL}/api/orders/${orderId}/payment-update`,
-        {
-          status: 'processing',
-          paymentId: payment._id,
-          transactionId: payment.transactionId
-        },
-        {
-          headers: {
-            'Authorization': req.headers.authorization
-          }
-        }
-      );
-    } catch (error) {
-      console.error('Error notifying order service:', error.message);
-      // Don't fail the request if notification fails
-    }
+    // try {
+    //   await axios.post(
+    //     `${process.env.ORDER_SERVICE_URL}/api/orders/${orderId}/payment-update`,
+    //     {
+    //       status: 'processing',
+    //       paymentId: payment._id,
+    //       transactionId: payment.transactionId
+    //     },
+    //     {
+    //       headers: {
+    //         'Authorization': req.headers.authorization
+    //       }
+    //     }
+    //   );
+    // } catch (error) {
+    //   console.error('Error notifying order service:', error.message);
+    //   // Don't fail the request if notification fails
+    // }
     
     res.status(200).json({
       success: true,
@@ -232,23 +232,23 @@ exports.verifyPayment = asyncHandler(async (req, res, next) => {
     await payment.save();
     
     // Notify order service about payment status update
-    try {
-      await axios.post(
-        `${process.env.ORDER_SERVICE_URL}/api/orders/${payment.order}/payment-update`,
-        {
-          status: payment.status,
-          paymentId: payment._id,
-          transactionId: payment.transactionId
-        },
-        {
-          headers: {
-            'Authorization': req.headers.authorization
-          }
-        }
-      );
-    } catch (error) {
-      console.error('Error notifying order service:', error.message);
-    }
+    // try {
+    //   await axios.post(
+    //     `${process.env.ORDER_SERVICE_URL}/api/orders/${payment.order}/payment-update`,
+    //     {
+    //       status: payment.status,
+    //       paymentId: payment._id,
+    //       transactionId: payment.transactionId
+    //     },
+    //     {
+    //       headers: {
+    //         'Authorization': req.headers.authorization
+    //       }
+    //     }
+    //   );
+    // } catch (error) {
+    //   console.error('Error notifying order service:', error.message);
+    // }
     
     res.status(200).json({
       success: true,
@@ -317,45 +317,45 @@ async function handleSuccessfulPayment(gateway, transactionId, webhookData) {
     if (payment) {
       console.log(`Found payment with ID: ${payment._id} for transaction ${transactionId}`);
       payment.status = 'completed';
-      payment.paymentDetails = { 
-        ...payment.paymentDetails, 
-        webhook: webhookData,
-        completedAt: new Date()
-      };
+      // payment.paymentDetails = { 
+      //   ...payment.paymentDetails, 
+      //   webhook: webhookData,
+      //   completedAt: new Date()
+      // };
       await payment.save();
       
       // Notify order service about successful payment
-      try {
-        await axios.post(
-          `${process.env.ORDER_SERVICE_URL}/api/orders/${payment.order}/payment-update`,
-          {
-            status: 'completed',
-            paymentId: payment._id,
-            transactionId: payment.transactionId
-          }
-        );
-      } catch (error) {
-        console.error('Error notifying order service:', error.message);
-      }
+      // try {
+      //   await axios.post(
+      //     `${process.env.ORDER_SERVICE_URL}/api/orders/${payment.order}/payment-update`,
+      //     {
+      //       status: 'completed',
+      //       paymentId: payment._id,
+      //       transactionId: payment.transactionId
+      //     }
+      //   );
+      // } catch (error) {
+      //   console.error('Error notifying order service:', error.message);
+      // }
       
       // Send notification to customer
-      try {
-        await axios.post(
-          `${process.env.NOTIFICATION_SERVICE_URL}/api/notifications/send`,
-          {
-            userId: payment.user,
-            orderId: payment.order,
-            type: 'payment-success',
-            message: `Your payment of ${payment.currency} ${payment.amount} was successful.`,
-            data: {
-              paymentId: payment._id,
-              transactionId: payment.transactionId
-            }
-          }
-        );
-      } catch (error) {
-        console.error('Error sending notification:', error.message);
-      }
+      // try {
+      //   await axios.post(
+      //     `${process.env.NOTIFICATION_SERVICE_URL}/api/notifications/send`,
+      //     {
+      //       userId: payment.user,
+      //       orderId: payment.order,
+      //       type: 'payment-success',
+      //       message: `Your payment of ${payment.currency} ${payment.amount} was successful.`,
+      //       data: {
+      //         paymentId: payment._id,
+      //         transactionId: payment.transactionId
+      //       }
+      //     }
+      //   );
+      // } catch (error) {
+      //   console.error('Error sending notification:', error.message);
+      // }
     } else {
       console.log(`No payment found with transaction ID: ${transactionId}`);
     }

@@ -64,7 +64,7 @@ const setupMessageConsumers = async () => {
       
       if (type === 'DELIVERY_STATUS_UPDATED') {
         try {
-          const Order = require('./models/CustomerOrders'); // ✅ Fix this!
+          const Order = require('./models/CustomerOrder'); // ✅ Fix this!
           const order = await Order.findById(orderId);
           
           if (order) {
