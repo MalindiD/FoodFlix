@@ -11,6 +11,7 @@ import OrderSuccess from './pages/CustomerService/OrderSuccess';
 import CheckoutPage from './pages/CustomerService/CheckoutPage';
 import PaymentSuccess from './pages/CustomerService/PaymentSuccess'; 
 import DeliveryDetailsPage from './pages/CustomerService/DeliveryDetailsPage';
+import OrderTracking from './pages/CustomerService/OrderTracking';
 
 import AuthContext from './context/AuthContext';
 import { CartProvider } from "./context/CartContext";
@@ -48,6 +49,7 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/restaurant/:id" element={<RestaurantDetail />} />
+      <Route path="/track/:orderId" element={<OrderTracking />} />
       
       {/* Protected Customer Routes
       {user?.role === 'customer' && (

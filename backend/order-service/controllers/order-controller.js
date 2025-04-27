@@ -9,7 +9,7 @@ const NOTIFICATION_SERVICE_URL = process.env.NOTIFICATION_SERVICE_URL;
 // Create a new order
 exports.createOrder = async (req, res) => {
   try {
-    const { restaurantId, items, totalAmount, deliveryAddress } = req.body;
+    const { restaurantId, items, totalPrice, deliveryAddress } = req.body;
     const customerId = req.user.id;
 
     // ✅ Verify restaurant
@@ -51,7 +51,7 @@ exports.createOrder = async (req, res) => {
       customerId,
       restaurantId,
       items,
-      totalAmount,
+      totalPrice,
       deliveryAddress,
       status: 'Pending'
     });
@@ -88,7 +88,8 @@ exports.createOrder = async (req, res) => {
           metadata: {
             email: customer.email,
             phone: customer.phone,
-            orderId: savedOrder._id
+            orderId: savedOrder._id,
+            customerName: customer.name
           }
         },
         {

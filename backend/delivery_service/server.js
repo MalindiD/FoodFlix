@@ -7,6 +7,7 @@ const morgan = require('morgan');
 const cors = require('cors');
 const http = require('http');
 const { Server } = require('socket.io');
+const locationRoutes = require('./routes/location-routes');
 
 dotenv.config();
 
@@ -27,6 +28,7 @@ app.use(cors());
 app.use(morgan('dev'));
 app.use('/api/partners', partnerRoutes);
 app.use('/api/delivery', deliveryRoutes);
+app.use('/api/location', locationRoutes);
 
 app.get('/', (req, res) => {
   res.send('Delivery Service API is running');

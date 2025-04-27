@@ -43,7 +43,7 @@ exports.getPayments = asyncHandler(async (req, res, next) => {
   const total = await Payment.countDocuments();
   const payments = await Payment.find()
     .populate('user', 'name email')
-    .populate('order', 'orderNumber totalAmount')
+    .populate('order', 'orderNumber totalPrice')
     .skip(startIndex)
     .limit(limit)
     .sort({ createdAt: -1 });
@@ -67,7 +67,7 @@ exports.getPayments = asyncHandler(async (req, res, next) => {
 exports.getPaymentByOrderId = asyncHandler(async (req, res, next) => {
   const payment = await Payment.findOne({ order: req.params.orderId })
     .populate('user', 'name email')
-    .populate('order', 'orderNumber totalAmount');
+    .populate('order', 'orderNumber totalPrice');
   
   if (!payment) {
     return next(

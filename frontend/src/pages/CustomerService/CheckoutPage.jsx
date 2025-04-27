@@ -79,7 +79,7 @@ const CheckoutPage = () => {
                 price: item.price,
                 quantity: item.quantity
               })),
-              totalAmount: orderTotal,
+              totalPrice: orderTotal,
               deliveryAddress: deliveryCoords
             },
             {
