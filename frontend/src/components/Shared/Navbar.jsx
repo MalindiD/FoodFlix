@@ -186,7 +186,8 @@ export default function Navbar({ onSearch }) {
 
           <ul className="space-y-5 text-gray-800 text-[15px] font-medium">
             <li className="flex items-center gap-3 hover:text-[#ec5834] cursor-pointer">
-              <Bookmark className="h-5 w-5" /> Orders
+              <Bookmark className="h-5 w-5" /> 
+              <Link to="/orders">Orders</Link>
             </li>
             <li className="flex items-center gap-3 hover:text-[#ec5834] cursor-pointer">
               <Heart className="h-5 w-5" /> Favorites
