@@ -21,76 +21,76 @@ spec:
         app: notification-service
     spec:
       containers:
-      - name: notification-service
-        image: nuwanifonseka/notification-service:latest
-        imagePullPolicy: IfNotPresent
-        ports:
-        - containerPort: 5000
-        env:
-        - name: NODE_ENV
-          value: "production"
-        - name: PORT
-          value: "5000"
-        - name: MONGO_URI
-          valueFrom:
-            secretKeyRef:
-              name: mongodb-secret
-              key: mongo-uri
-        - name: JWT_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: mongodb-secret
-              key: jwt-secret
-        - name: SENDGRID_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: notification-secrets
-              key: sendgrid-api-key
-        - name: EMAIL_FROM
-          valueFrom:
-            secretKeyRef:
-              name: notification-secrets
-              key: email-from
-        - name: TWILIO_ACCOUNT_SID
-          valueFrom:
-            secretKeyRef:
-              name: notification-secrets
-              key: twilio-account-sid
-        - name: TWILIO_AUTH_TOKEN
-          valueFrom:
-            secretKeyRef:
-              name: notification-secrets
-              key: twilio-auth-token
-        - name: TWILIO_PHONE_NUMBER
-          valueFrom:
-            secretKeyRef:
-              name: notification-secrets
-              key: twilio-phone-number
-        - name: AUTH_SERVICE_URL
-          value: "http://auth-service:3000"
-        - name: ORDER_SERVICE_URL
-          value: "http://order-service:4000"
-        - name: PAYMENT_SERVICE_URL
-          value: "http://payment-service:3000"
-        - name: CLIENT_URL
-          value: "http://frontend:3000"
-        resources:
-          limits:
-            cpu: "500m"
-            memory: "512Mi"
-          requests:
-            cpu: "200m"
-            memory: "256Mi"
-        livenessProbe:
-          httpGet:
-            path: /api/notifications/health
-            port: 5000
-          initialDelaySeconds: 30
-          periodSeconds: 15
-        readinessProbe:
-          httpGet:
-            path: /api/notifications/health
-            port: 5000
-          initialDelaySeconds: 5
-          periodSeconds: 10
+        - name: notification-service
+          image: foodflix/notification-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5004
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: PORT
+              value: "5004"
+            - name: MONGO_URI
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: mongo-uri
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: jwt-secret
+            - name: SENDGRID_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: notification-secrets
+                  key: sendgrid-api-key
+            - name: EMAIL_FROM
+              valueFrom:
+                secretKeyRef:
+                  name: notification-secrets
+                  key: email-from
+            - name: TWILIO_ACCOUNT_SID
+              valueFrom:
+                secretKeyRef:
+                  name: notification-secrets
+                  key: twilio-account-sid
+            - name: TWILIO_AUTH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: notification-secrets
+                  key: twilio-auth-token
+            - name: TWILIO_PHONE_NUMBER
+              valueFrom:
+                secretKeyRef:
+                  name: notification-secrets
+                  key: twilio-phone-number
+            - name: AUTH_SERVICE_URL
+              value: "http://auth-service:3000"
+            - name: ORDER_SERVICE_URL
+              value: "http://order-service:4000"
+            - name: PAYMENT_SERVICE_URL
+              value: "http://payment-service:3000"
+            - name: CLIENT_URL
+              value: "http://frontend:3000"
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+          livenessProbe:
+            httpGet:
+              path: /api/notifications/health
+              port: 5004
+            initialDelaySeconds: 30
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /api/notifications/health
+              port: 5004
+            initialDelaySeconds: 5
+            periodSeconds: 10
       restartPolicy: Always

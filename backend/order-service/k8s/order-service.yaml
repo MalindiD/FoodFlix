@@ -7,6 +7,6 @@ spec:
   selector:
     app: order-service
   ports:
-    - port: 5002
-      targetPort: 5002
+    - port: 4000
+      targetPort: 4000
   type: ClusterIP

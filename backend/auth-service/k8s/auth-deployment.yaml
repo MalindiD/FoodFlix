@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: auth-service
-          image: nuwanifonseka/auth-service:latest
+          image: foodflix/auth-service:latest
           ports:
             - containerPort: 3000
           env:

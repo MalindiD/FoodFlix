@@ -13,10 +13,10 @@ COPY . .
 
 # Set environment variables
 ENV NODE_ENV=production
-ENV PORT=5000
+ENV PORT=5004
 
 # Expose port
-EXPOSE 5000
+EXPOSE 5004
 
 # Start the application
 CMD ["node", "server.js"]

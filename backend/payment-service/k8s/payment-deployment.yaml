@@ -21,66 +21,70 @@ spec:
         app: payment-service
     spec:
       containers:
-      - name: payment-service
-        image: nuwanifonseka/payment-service:latest
-        imagePullPolicy: IfNotPresent
-        ports:
-        - containerPort: 3000
-        env:
-        - name: NODE_ENV
-          value: "production"
-        - name: PORT
-          value: "3000"
-        - name: MONGO_URI
-          valueFrom:
-            secretKeyRef:
-              name: mongodb-secret
-              key: mongo-uri
-        - name: JWT_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: payment-secrets   
-              key: jwt-secret
-        - name: JWT_EXPIRE
-          value: "30d"
-        - name: ORDER_SERVICE_URL
-          value: "http://order-service:4000"
-        - name: NOTIFICATION_SERVICE_URL
-          value: "http://notification-service:5000"
-        - name: CLIENT_URL
-          value: "http://frontend:3001"
-        - name: API_URL
-          value: "http://payment-service:3000"
-        - name: CORS_ALLOW_ORIGIN
-          value: "*" 
-        # Stripe configuration
-        - name: STRIPE_SECRET_KEY
-          valueFrom:
-            secretKeyRef:
-              name: payment-secrets
-              key: stripe-secret-key
-        - name: STRIPE_WEBHOOK_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: payment-secrets
-              key: stripe-webhook-secret
-        resources:
-          limits:
-            cpu: "500m"
-            memory: "512Mi"
-          requests:
-            cpu: "200m"
-            memory: "256Mi"
-        livenessProbe:
-          httpGet:
-            path: /api/payments/health
-            port: 3000
-          initialDelaySeconds: 30
-          periodSeconds: 15
-        readinessProbe:
-          httpGet:
-            path: /api/payments/health
-            port: 3000
-          initialDelaySeconds: 5
-          periodSeconds: 10
+        - name: payment-service
+          image: foodflix/payment-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3002
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: PORT
+              value: "3002"
+            - name: MONGO_URI
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: mongo-uri
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: payment-secrets
+                  key: jwt-secret
+            - name: JWT_EXPIRE
+              value: "30d"
+            - name: ORDER_SERVICE_URL
+              value: "http://order-service:4000"
+            - name: NOTIFICATION_SERVICE_URL
+              value: "http://notification-service:5004"
+            - name: CLIENT_URL
+              value: "http://frontend:3001"
+            - name: AUTH_SERVICE_URL
+              value: "http://payment-service:3000"
+            - name: DELIVERY_SERVICE_URL
+              value: "http://delivery-service:5003"
+            - name: API_URL
+              value: "http://payment-service:3002"
+            - name: CORS_ALLOW_ORIGIN
+              value: "*"
+            # Stripe configuration
+            - name: STRIPE_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: payment-secrets
+                  key: stripe-secret-key
+            - name: STRIPE_WEBHOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: payment-secrets
+                  key: stripe-webhook-secret
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+          livenessProbe:
+            httpGet:
+              path: /api/payments/health
+              port: 3002
+            initialDelaySeconds: 30
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /api/payments/health
+              port: 3002
+            initialDelaySeconds: 5
+            periodSeconds: 10
       restartPolicy: Always

@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: restaurant-management-service
-          image: nuwanifonseka/restaurant-service:latest
+          image: foodflix/restaurant-service:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 5000
