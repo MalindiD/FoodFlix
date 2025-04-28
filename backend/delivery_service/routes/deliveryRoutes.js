@@ -9,7 +9,24 @@ const { protect, authorize } = require('../middleware/auth');
 // ✅ Assign a delivery partner to a new order (protected)
 router.post('/assign', protect, deliveryController.createAssignment);
 
-// ✅ Get delivery details by internal ID (protected)
+router.get('/public/:orderId', deliveryController.getDeliveryDetails);
+
+// ✅ Add this route to fetch assigned delivery
+router.get('/assigned', protect, async (req, res) => {
+  try {
+    const delivery = await Delivery.findOne({ deliveryPartner: req.user.id, deliveryStatus: { $ne: 'Delivered' } }).populate('deliveryPartner');
+
+    if (!delivery) {
+      return res.status(404).json({ message: 'No active delivery assigned' });
+    }
+
+    res.status(200).json(delivery);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+/* ✅ Get delivery details by internal ID (protected)
 router.get('/:id', protect, async (req, res) => {
   try {
     const delivery = await Delivery.findById(req.params.id).populate('deliveryPartner');
@@ -18,7 +35,7 @@ router.get('/:id', protect, async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
-});
+});*/
 
 router.post('/notify-again', deliveryController.resendNotification);
 

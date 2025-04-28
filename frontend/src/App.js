@@ -9,12 +9,19 @@ import RestaurantDetail from './pages/CustomerService/RestaurantDetail';
 import Cart from './pages/CustomerService/Cart';
 import OrderSuccess from './pages/CustomerService/OrderSuccess';
 import CheckoutPage from './pages/CustomerService/CheckoutPage';
-import PaymentSuccess from './pages/CustomerService/PaymentSuccess'; 
+import PaymentSuccess from './pages/CustomerService/PaymentSuccess';
+import OrderTracking from './pages/CustomerService/OrderTracking';
+
 import DeliveryDetailsPage from './pages/CustomerService/DeliveryDetailsPage';
+import LoginPartner from './delivery_service/pages/loginPartner';
+import PartnerDashboard from './delivery_service/pages/PartnerDashboard';
+import MockDriver from './delivery_service/pages/MockDriver';
 
 import AuthContext from './context/AuthContext';
 import { CartProvider } from "./context/CartContext";
 import CartPopup from "./components/CartPopup";
+
+import PartnerForm from './delivery_service/pages/RegisterPartner';
 
 function App() {
   const { user } = useContext(AuthContext);
@@ -24,6 +31,7 @@ function App() {
       <CartProvider>
         <CartPopup />
         <Routes>
+          {/* Customer routes */}
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -31,8 +39,13 @@ function App() {
           <Route path="/restaurant/:id" element={<RestaurantDetail />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/payment-success" element={<PaymentSuccess />} /> {/* ✅ Added */}
           <Route path="/order-success" element={<OrderSuccess />} />
           <Route path="/delivery-details" element={<DeliveryDetailsPage />} />
+          <Route path="/partnerform" element={<PartnerForm />} />
+          <Route path="/mock-driver/:orderId/:lat/:lng" element={<MockDriver />} />
+          <Route path="/order-tracking/:orderId" element={<OrderTracking />} />
+
           {/* Catch-all for customers */}
           <Route path="*" element={<Navigate to="/dashboard" />} />
         </Routes>
@@ -40,7 +53,6 @@ function App() {
     );
   }
 
-  
   return (
     <Routes>
       {/* Public Routes */}
@@ -48,43 +60,35 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/restaurant/:id" element={<RestaurantDetail />} />
-      
-      {/* Protected Customer Routes
-      {user?.role === 'customer' && (
-        <>
-          <Route path="/dashboard" element={<CustomerDashboard />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/checkout" element={<CheckoutPage />} />
-          <Route path="/payment-success" element={<PaymentSuccess />} />
-          <Route path="/order-success" element={<OrderSuccess />} />
-        </>
-      )} */}
-      
-      {/* Delivery Role Routes */}
+      <Route path="/login-partner" element={<LoginPartner />} />
+      <Route path="/mock-driver/:orderId/:lat/:lng" element={<MockDriver />} />
+      <Route path="/order-tracking/:orderId" element={<OrderTracking />} />
+
+      {/* Delivery Partner Routes */}
       {user?.role === 'delivery' && (
         <>
-          <Route path="/delivery-dashboard" element={<Navigate to="/dashboard" />} />
-          {/* Add more delivery routes as needed */}
+          <Route path="/partner-dashboard" element={<PartnerDashboard />} />
+          <Route path="*" element={<Navigate to="/partner-dashboard" />} />
         </>
       )}
-      
+
       {/* Restaurant Role Routes */}
       {user?.role === 'restaurant' && (
         <>
           <Route path="/restaurant-dashboard" element={<Navigate to="/dashboard" />} />
-          {/* Add more restaurant routes as needed */}
+          {/* More restaurant routes if needed */}
         </>
       )}
-      
+
       {/* Admin Role Routes */}
       {user?.role === 'admin' && (
         <>
           <Route path="/admin" element={<Navigate to="/dashboard" />} />
-          {/* Add more admin routes as needed */}
+          {/* More admin routes if needed */}
         </>
       )}
-      
-      {/* Catch-all Route */}
+
+      {/* Catch-all for unknown users */}
       <Route
         path="*"
         element={
@@ -92,7 +96,7 @@ function App() {
             <Navigate
               to={
                 user.role === 'customer' ? '/dashboard' :
-                user.role === 'delivery' ? '/delivery-dashboard' :
+                user.role === 'delivery' ? '/partner-dashboard' :
                 user.role === 'restaurant' ? '/restaurant-dashboard' :
                 user.role === 'admin' ? '/admin' :
                 '/'

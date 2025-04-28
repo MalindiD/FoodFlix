@@ -1,0 +1,177 @@
+/* General Reset */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f4f6f9;
+  color: #333;
+  padding: 0;
+  margin: 0;
+}
+
+/* Form Container */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 450px;
+  margin: 2rem auto;
+  padding: 2.5rem;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out;
+}
+
+.form:hover {
+  transform: translateY(-10px); /* Subtle hover effect */
+}
+
+.form h2 {
+  text-align: center;
+  font-size: 1.5rem;
+  color: #333;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+/* Styling for Inputs, Select and Button */
+.form input,
+.form select,
+.form button {
+  padding: 12px 15px;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  outline: none;
+  transition: all 0.3s ease-in-out;
+}
+
+.form input:focus,
+.form select:focus,
+.form button:focus {
+  border-color: #ec5834;
+  box-shadow: 0 0 5px rgba(236, 88, 52, 0.5);
+}
+
+.form select {
+  background-color: #f9f9f9;
+  color: #777;
+}
+
+.form input::placeholder,
+.form select option {
+  color: #999;
+}
+
+.form input[type="file"] {
+  background-color: transparent;
+  border: none;
+  padding: 8px 0;
+}
+
+.form input[type="file"]:focus {
+  outline: none;
+}
+
+/* File Input Styling */
+.form .file-input-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.form img {
+  max-width: 100%;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+/* Button Styling */
+.form button {
+  background-color: #ec5834;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  text-align: center;
+  padding: 14px;
+  font-size: 1.1rem;
+}
+
+.form button:hover {
+  background-color: #d75a2a;
+}
+
+.form button:active {
+  background-color: #c24a22;
+}
+
+/* Styling for Input Groups */
+.form .form-group {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+}
+
+.form .form-group input {
+  flex: 1;
+}
+
+/* Styling for Inputs and Selects */
+.form input,
+.form select {
+  background-color: #f9f9f9;
+  border: 1px solid #e0e0e0;
+}
+
+.form input:focus,
+.form select:focus {
+  background-color: #fff;
+}
+
+.form input[type="text"]:focus,
+.form select:focus {
+  background-color: #fff;
+}
+
+.form input[type="file"]:focus {
+  background-color: #fff;
+}
+
+.form label {
+  font-weight: 600;
+  margin-bottom: 6px;
+  font-size: 1rem;
+  color: #555;
+}
+
+.form .error {
+  color: red;
+  font-size: 0.9rem;
+  margin-top: 5px;
+  text-align: center;
+}
+
+/* Button & Links Styling */
+.form .register-link {
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+.form .register-link a {
+  color: #ec5834;
+  text-decoration: none;
+}
+
+.form .register-link a:hover {
+  text-decoration: underline;
+}

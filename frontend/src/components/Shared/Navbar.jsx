@@ -220,9 +220,12 @@ export default function Navbar({ onSearch }) {
             <p className="hover:text-[#ec5834] cursor-pointer">
               Add your restaurant
             </p>
-            <p className="hover:text-[#ec5834] cursor-pointer">
-              Sign up to deliver
-            </p>
+            <p
+                className="hover:text-[#ec5834] cursor-pointer"
+                onClick={() => navigate("/partnerform")}
+              >
+                Sign up to deliver
+              </p>
           </div>
         </div>
       </div>

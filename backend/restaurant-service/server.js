@@ -51,10 +51,13 @@ console.log("🟢 Server is running on port", process.env.PORT || 5000);
 const restaurantRoutes = require("./routes/restaurant/restaurantRoutes");
 const menuItemRoutes = require("./routes/restaurant/menuItemRoutes");
 const orderRoutes = require("./routes/restaurant/orderRoutes");
+const locationRoutes = require("./routes/location");
+
 
 app.use("/api/restaurants", restaurantRoutes);
 app.use("/api/restaurants/:restaurantId/menu-items", menuItemRoutes);
 app.use("/api/restaurants/:restaurantId/orders", orderRoutes);
+app.use(locationRoutes);
 
 // Error handler
 app.use((err, req, res, next) => {
