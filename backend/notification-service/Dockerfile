@@ -1,22 +1,20 @@
-FROM node:18-alpine
+# Use Node.js LTS image
+FROM node:18
 
+# Set working directory inside container
 WORKDIR /app
 
-# Copy package.json and package-lock.json
+# Copy package.json and package-lock.json first
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install --production
+# Install all dependencies
+RUN npm install
 
-# Copy source code
+# Copy all source code
 COPY . .
 
-# Set environment variables
-ENV NODE_ENV=production
-ENV PORT=5000
+# Expose the port your app runs on
+EXPOSE 5001
 
-# Expose port
-EXPOSE 5000
-
-# Start the application
-CMD ["node", "server.js"]
+# Command to run the app
+CMD ["npm", "start"]
