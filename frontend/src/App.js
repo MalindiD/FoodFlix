@@ -36,6 +36,7 @@ function App() {
           <Route path="/order-success" element={<OrderSuccess />} />
           <Route path="/delivery-details" element={<DeliveryDetailsPage />} />
           <Route path="/orders" element={<CustomerOrders />} />
+          <Route path="/track/:orderId" element={<OrderTracking />} />
           {/* Catch-all for customers */}
           <Route path="*" element={<Navigate to="/dashboard" />} />
         </Routes>
