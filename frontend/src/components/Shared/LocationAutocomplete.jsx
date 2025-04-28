@@ -9,26 +9,26 @@ const LocationAutocomplete = ({ onSelect }) => {
   const handleChange = async (e) => {
     const value = e.target.value;
     setQuery(value);
-
+  
     if (value.length < 3) {
       setResults([]);
       return;
     }
-
+  
     try {
-      const res = await axios.get('https://api.locationiq.com/v1/autocomplete', {
+      // ✅ Call your own backend instead of LocationIQ directly
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/location-autocomplete`, {
         params: {
-          key: process.env.REACT_APP_LOCATIONIQ_KEY,
-          q: value,
-          format: 'json',
+          query: value,
         }
       });
-
+  
       setResults(res.data);
     } catch (err) {
       console.error('Location search failed', err);
     }
   };
+  
 
   const handleSelect = (place) => {
     setQuery(place.display_name);
