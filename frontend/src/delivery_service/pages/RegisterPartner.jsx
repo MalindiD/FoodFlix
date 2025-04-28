@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { uploadImage } from "../api"; // Cloudinary helper
+import { uploadImage } from "../api";  
 import './style.css';
 
 const PartnerForm = () => {
@@ -46,6 +46,7 @@ const PartnerForm = () => {
       // ✅ Upload to Cloudinary if a new file was selected
       if (formData.profileImage) {
         imageUrl = await uploadImage(formData.profileImage);
+
       }
 
       const payload = {
