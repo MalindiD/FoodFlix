@@ -4,36 +4,36 @@ const menuItemSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: true,
+      required: true
     },
     description: {
       type: String,
-      required: true,
+      required: true
     },
     price: {
       type: Number,
-      required: true,
+      required: true
     },
     category: {
       type: String,
-      required: true,
+      required: true
     },
     image: {
-      type: String,
+      type: String
     },
     isAvailable: {
       type: Boolean,
-      default: true,
+      default: true
     },
     restaurantId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Restaurant",
-      required: true,
+      required: true
     },
     tags: {
       type: [String],
-      default: [],
-    },
+      default: []
+    }
   },
   { timestamps: true }
 );
