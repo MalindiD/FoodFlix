@@ -64,21 +64,19 @@ function App() {
   };
 
   return (
-    <>
-      {user?.role === "customer" && (
-        <CartProvider>
-          <CartPopup />
-        </CartProvider>
-      )}
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/restaurant/:id" element={<RestaurantDetail />} />
-        <Route path="/track/:orderId" element={<OrderTracking />} />
+    <CartProvider> {/* Wrap entire app with CartProvider */}
+    {user?.role === "customer" && <CartPopup />}
+    <Routes>
+      {/* Public Routes */}
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/restaurant/:id" element={<RestaurantDetail />} />
+      <Route path="/track/:orderId" element={<OrderTracking />} />
+
 
         {/* Customer Role Routes */}
+
         {user?.role === "customer" && (
           <>
             <Route path="/dashboard" element={<CustomerDashboard />} />
@@ -91,7 +89,6 @@ function App() {
             <Route path="*" element={<Navigate to="/dashboard" />} />
           </>
         )}
-
         {/* Delivery Partner Routes */}
         {user?.role === "delivery" && (
           <>
@@ -143,7 +140,7 @@ function App() {
           }
         />
       </Routes>
-    </>
+      </CartProvider>
   );
 }
 
