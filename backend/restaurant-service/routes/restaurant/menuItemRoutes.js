@@ -2,10 +2,10 @@ const express = require("express");
 const router = express.Router({ mergeParams: true });
 const menuItemController = require("../../controllers/restaurant/menuItemController");
 
-// ✅ Import multer middleware
+//  Import multer middleware
 const upload = require("../../middleware/multerConfig");
 
-// ✅ Enable image upload
+//  Enable image upload
 router.post("/", upload.single("image"), menuItemController.createMenuItem);
 
 router.get("/", menuItemController.getMenuItems);

@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom"; // 👈 Import Link
+import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const RestaurantRegister = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -53,6 +55,7 @@ const RestaurantRegister = () => {
       );
 
       setMessage("Registration successful!");
+      navigate("/restaurant-management/login");
     } catch (err) {
       setMessage(err.response?.data?.message || "Registration failed.");
     }
@@ -114,7 +117,6 @@ const RestaurantRegister = () => {
 
       {message && <p className="mt-3 text-center text-sm">{message}</p>}
 
-      {/* 👇 Add Login Link */}
       <p className="mt-4 text-center text-sm">
         Already have an account?{" "}
         <Link

@@ -1,6 +1,10 @@
 const Notification = require('../models/Notification');
 const { sendEmail } = require('../utils/emailService');
 const { sendSMS } = require('../utils/smsService');
+const { 
+  generateTrackingSmsMessage, 
+  generateTrackingEmailMessage 
+} = require('../utils/trackingLinkGenerator');
 
 // Generic notification sender (email, sms or both)
 exports.sendNotification = async (req, res) => {
@@ -17,14 +21,26 @@ exports.sendNotification = async (req, res) => {
       metadata,
     });
 
+    // For order confirmations, use tracking links
+    let emailContent = message;
+    let smsContent = message;
+    
+    if (channel === 'order' && metadata.orderId) {
+      // Generate tracking messages
+      const customerName = metadata.customerName || 'Customer';
+      const { text, html } = generateTrackingEmailMessage(customerName, metadata.orderId);
+      emailContent = html;
+      smsContent = generateTrackingSmsMessage(customerName, metadata.orderId);
+    }
+
     // Send Email if needed
     if ((type === 'email' || type === 'both') && metadata.email) {
-      await sendEmail(metadata.email, title, message);
+      await sendEmail(metadata.email, title,emailContent);
     }
 
     // Send SMS if needed
     if ((type === 'sms' || type === 'both') && metadata.phone) {
-      await sendSMS(metadata.phone, message);
+      await sendSMS(metadata.phone, smsContent);
     }
 
     // Update status to sent

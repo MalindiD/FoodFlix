@@ -93,6 +93,15 @@ export default function Login() {
         >
           {loading ? 'Logging in...' : 'Login'}
         </button>
+
+        {/* Button for logging in as Delivery Partner */}
+        <button
+          type="button"
+          onClick={() => navigate('/login-partner')}
+          className="w-full mt-4 bg-gray-100 text-[#ec5834] py-2 rounded hover:bg-orange-600 transition"
+        >
+          Login as Delivery Partner
+        </button>
       </form>
     </div>
   );

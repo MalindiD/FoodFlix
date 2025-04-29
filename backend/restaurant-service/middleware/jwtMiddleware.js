@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 
+// Protect middleware
 const protect = (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1];
   if (!token)
@@ -10,11 +11,21 @@ const protect = (req, res, next) => {
       token,
       process.env.JWT_SECRET || "defaultsecret"
     );
-    req.restaurant = decoded;
+    req.user = decoded;
     next();
   } catch (err) {
     res.status(401).json({ message: "Invalid token" });
   }
 };
 
-module.exports = protect;
+// Authorize middleware
+const authorize = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({ message: "Not authorized for this route" });
+    }
+    next();
+  };
+};
+
+module.exports = { protect, authorize };

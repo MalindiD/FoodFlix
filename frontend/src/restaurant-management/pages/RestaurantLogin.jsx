@@ -14,21 +14,23 @@ const RestaurantLogin = () => {
     try {
       const res = await axios.post(
         "http://localhost:5000/api/auth/restaurantlogin",
-        {
-          email,
-          password
-        }
+        { email, password }
       );
 
       const token = res.data.token;
-      const restaurant = res.data.restaurant;
+      const user = res.data.restaurant;
 
-      // ✅ Use sessionStorage for full tab/window isolation
       sessionStorage.setItem("token", token);
-      sessionStorage.setItem("restaurant", JSON.stringify(restaurant));
 
-      alert("Login successful!");
-      navigate("/restaurant-management/dashboard");
+      if (user.role === "admin") {
+        sessionStorage.setItem("admin", JSON.stringify(user));
+        alert("Admin login successful!");
+        navigate("/admin/dashboard");
+      } else {
+        sessionStorage.setItem("restaurant", JSON.stringify(user));
+        alert("Login successful!");
+        navigate("/restaurant-management/dashboard");
+      }
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");
     }

@@ -1,4 +1,5 @@
 const Restaurant = require("../../models/restaurant/Restaurant");
+const CustomerOrder = require("../../models/CustomerOrders");
 const MenuItem = require("../../models/restaurant/MenuItem");
 
 // ✅ Get all restaurants
@@ -7,7 +8,9 @@ exports.getAllRestaurants = async (req, res) => {
     const restaurants = await Restaurant.find();
     res.status(200).json(restaurants);
   } catch (error) {
-    res.status(500).json({ message: "Error fetching restaurants", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error fetching restaurants", error: error.message });
   }
 };
 
@@ -20,7 +23,9 @@ exports.getRestaurantById = async (req, res) => {
     }
     res.status(200).json(restaurant);
   } catch (error) {
-    res.status(500).json({ message: "Error fetching restaurant", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error fetching restaurant", error: error.message });
   }
 };
 
@@ -31,11 +36,13 @@ exports.createRestaurant = async (req, res) => {
     await restaurant.save();
     res.status(201).json(restaurant);
   } catch (error) {
-    res.status(400).json({ message: "Error creating restaurant", error: error.message });
+    res
+      .status(400)
+      .json({ message: "Error creating restaurant", error: error.message });
   }
 };
 
-// ✅ Update restaurant
+// Update restaurant (with profile image handling)
 exports.updateRestaurant = async (req, res) => {
   try {
     const imageFromFile = req.file ? req.file.path : "";
@@ -76,7 +83,9 @@ exports.deleteRestaurant = async (req, res) => {
     }
     res.status(200).json({ message: "Restaurant deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Error deleting restaurant", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error deleting restaurant", error: error.message });
   }
 };
 
@@ -93,7 +102,9 @@ exports.updateAvailability = async (req, res) => {
     }
     res.status(200).json(restaurant);
   } catch (error) {
-    res.status(400).json({ message: "Error updating availability", error: error.message });
+    res
+      .status(400)
+      .json({ message: "Error updating availability", error: error.message });
   }
 };
 
@@ -102,14 +113,16 @@ exports.filterByCategoryOrTag = async (req, res) => {
   const { keyword } = req.query;
 
   if (!keyword || keyword.trim() === "") {
-    return res.status(400).json({ message: "Keyword query parameter is required" });
+    return res
+      .status(400)
+      .json({ message: "Keyword query parameter is required" });
   }
 
   try {
     const matchingItemRestaurantIds = await MenuItem.find({
       $or: [
-        { category: { $regex: keyword, $options: 'i' } },
-        { tags: { $regex: keyword, $options: 'i' } }
+        { category: { $regex: keyword, $options: "i" } },
+        { tags: { $regex: keyword, $options: "i" } }
       ]
     }).distinct("restaurantId");
 
@@ -119,7 +132,9 @@ exports.filterByCategoryOrTag = async (req, res) => {
 
     res.status(200).json(restaurants);
   } catch (error) {
-    res.status(500).json({ message: "Error filtering restaurants", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error filtering restaurants", error: error.message });
   }
 };
 
@@ -132,5 +147,42 @@ exports.searchRestaurants = async (req, res) => {
     res.status(200).json(results);
   } catch (error) {
     res.status(500).json({ message: "Search failed", error: error.message });
+  }
+};
+
+// Verify restaurant
+exports.verifyRestaurant = async (req, res) => {
+  try {
+    const restaurant = await Restaurant.findByIdAndUpdate(
+      req.params.id,
+      { isVerified: true },
+      { new: true }
+    );
+    if (!restaurant)
+      return res.status(404).json({ message: "Restaurant not found" });
+    res.json(restaurant);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Verification failed", error: error.message });
+  }
+};
+
+// Mark an order as paid
+exports.markOrderAsPaid = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const order = await CustomerOrder.findById(orderId);
+    if (!order) return res.status(404).json({ message: "Order not found" });
+
+    order.paymentStatus = "Paid";
+    order.paidAt = new Date();
+    await order.save();
+
+    res.status(200).json({ message: "Order marked as paid", order });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Failed to mark order as paid", error: error.message });
   }
 };

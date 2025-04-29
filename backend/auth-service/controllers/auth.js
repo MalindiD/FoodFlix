@@ -112,6 +112,11 @@ exports.getUsers = asyncHandler(async (req, res, next) => {
 
 // @desc    Admin - Get single user
 exports.getUser = asyncHandler(async (req, res, next) => {
+  // ✅ First check if ID is valid
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    return next(new ErrorResponse(`Invalid ID format`, 400));
+  }
+  
   const user = await User.findById(req.params.id);
   if (!user) return next(new ErrorResponse(`No user found with id ${req.params.id}`, 404));
   res.status(200).json({ success: true, data: user });

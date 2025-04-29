@@ -21,7 +21,7 @@ router.get('/health', (req, res) => {
 });
 
 // Generic notification (email/sms/both)
-router.post('/', protect, sendNotification);
+router.post('/', protect,authorize('admin', 'system'), sendNotification);
 
 // Order-specific notification
 router.post('/order', protect, sendOrderNotification);

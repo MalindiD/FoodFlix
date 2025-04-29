@@ -25,11 +25,30 @@ exports.protect = asyncHandler(async (req, res, next) => {
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Set user info in request
-    req.user = {
-      id: decoded.id,
-      role: decoded.role
-    };
+    // // Set user info in request
+    // req.user = {
+    //   id: decoded.id,
+    //   role: decoded.role
+    // };
+
+    // next();
+
+    // ✅ Handle service accounts differently
+    if (decoded.service && decoded.role === 'system') {
+      req.user = {
+        id: decoded.id,
+        role: decoded.role,
+        service: true // Flag as service account
+      };
+      return next(); // Skip database check
+    }
+
+    // ✅ For regular users, fetch from database
+    req.user = await User.findById(decoded.id);
+    
+    if (!req.user) {
+      return next(new ErrorResponse('User no longer exists', 401));
+    }
 
     next();
   } catch (err) {

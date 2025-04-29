@@ -15,7 +15,7 @@ COPY . .
 
 # Set environment variables
 ENV NODE_ENV=production
-ENV PORT=3000
+ENV PORT=3002
 
 # Create non-root user for security
 RUN addgroup -g 1001 nodejs && \
@@ -26,7 +26,7 @@ RUN addgroup -g 1001 nodejs && \
 USER nodejs
 
 # Expose the port the app will run on
-EXPOSE 3000
+EXPOSE 3002
 
 # Command to run the application
 CMD ["node", "server.js"]

@@ -6,10 +6,10 @@ const {
   loginRestaurant
 } = require("../../controllers/restaurant/restaurantAuthController");
 
-console.log("✅ authRoutes file loaded");
+console.log(" authRoutes file loaded");
 
 router.get("/ping", (req, res) => {
-  res.send("✅ Pong");
+  res.send(" Pong");
 });
 
 router.post(

@@ -7,6 +7,8 @@ const morgan = require('morgan');
 const socketio = require('socket.io');
 const connectDB = require('./config/db');
 const errorHandler = require('./middleware/error');
+require('dotenv').config();
+
 
 // Load env variables
 dotenv.config();

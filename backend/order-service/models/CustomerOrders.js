@@ -29,7 +29,7 @@ const CustomerOrderSchema = new mongoose.Schema({
       default: 1
     }
   }],
-  totalAmount: {
+  totalPrice: {
     type: Number,
     required: true
   },
@@ -39,8 +39,36 @@ const CustomerOrderSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['Pending', 'Confirmed', 'Preparing', 'Out for Delivery', 'Delivered', 'Cancelled'],
+    enum: ['Pending', 'Confirmed', 'Preparing', 'Cooking', 'Out for Delivery', 'Delivered', 'Cancelled'],
     default: 'Pending'
+  },
+  statusHistory: [
+    {
+      status: {
+        type: String,
+        required: true
+      },
+      timestamp: {
+        type: Date,
+        default: Date.now
+      }
+    }
+  ],
+  specialInstructions: {
+    type: String
+  },
+  paymentStatus: {
+    type: String,
+    enum: ["Pending", "Paid", "Failed"],
+    default: "Pending"
+  },
+  paidAt: {
+    type: Date
+  },
+  paymentMethod: {
+    type: String,
+    enum: ["stripe", "paypal"],
+    default: "stripe"
   },
   createdAt: {
     type: Date,
@@ -54,6 +82,12 @@ const CustomerOrderSchema = new mongoose.Schema({
 
 // Pre-save hook to update the updatedAt field
 CustomerOrderSchema.pre('save', function(next) {
+  if (this.isModified("status")) {
+    this.statusHistory.push({
+      status: this.status,
+      timestamp: new Date()
+    });
+  }
   this.updatedAt = Date.now();
   next();
 });

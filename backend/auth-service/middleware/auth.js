@@ -32,6 +32,16 @@ exports.protect = asyncHandler(async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     console.log('[✅ JWT DECODED]', decoded);
 
+    // ✅ Handle service accounts first
+    if (decoded.service && decoded.role === 'system') {
+      req.user = {
+        id: decoded.id,
+        role: decoded.role,
+        service: true
+      };
+      return next(); // Skip database check
+    }
+
     // Optionally fetch user from DB
     req.user = await User.findById(decoded.id);
 
