@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: payment-service
-          image: foodflix/payment-service:latest
+          image: malindid/payment-service:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3002
