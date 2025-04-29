@@ -4,7 +4,7 @@ const MenuItem = require("../../models/restaurant/MenuItem");
 exports.getMenuItems = async (req, res) => {
   try {
     const menuItems = await MenuItem.find({
-      restaurantId: req.params.restaurantId,
+      restaurantId: req.params.restaurantId
     });
     res.status(200).json(menuItems);
   } catch (error) {
@@ -37,6 +37,7 @@ exports.createMenuItem = async (req, res) => {
   const imageFromFile = req.file ? req.file.path : "";
   const imageFromUrl = req.body.imageUrl || "";
 
+  // Parse tags field
   let parsedTags = [];
   try {
     if (typeof req.body.tags === "string") {
@@ -45,6 +46,7 @@ exports.createMenuItem = async (req, res) => {
       parsedTags = req.body.tags;
     }
   } catch (err) {
+    console.error("Error parsing tags:", err);
     return res.status(400).json({ message: "Invalid tags format" });
   }
 
@@ -53,7 +55,7 @@ exports.createMenuItem = async (req, res) => {
       ...req.body,
       restaurantId: req.params.restaurantId,
       image: imageFromFile || imageFromUrl,
-      tags: parsedTags,
+      tags: parsedTags // use parsed tags array
     });
     await menuItem.save();
     res.status(201).json(menuItem);
@@ -73,6 +75,7 @@ exports.updateMenuItem = async (req, res) => {
   const existingImage = req.body.existingImage || "";
   const finalImage = imageFromFile || imageFromUrl || existingImage;
 
+  // Parse tags field
   let parsedTags = [];
   try {
     if (typeof req.body.tags === "string") {
@@ -81,6 +84,7 @@ exports.updateMenuItem = async (req, res) => {
       parsedTags = req.body.tags;
     }
   } catch (err) {
+    console.error("Error parsing tags:", err);
     return res.status(400).json({ message: "Invalid tags format" });
   }
 
@@ -90,7 +94,7 @@ exports.updateMenuItem = async (req, res) => {
       {
         ...req.body,
         image: finalImage,
-        tags: parsedTags,
+        tags: parsedTags // use parsed tags array
       },
       { new: true }
     );
@@ -112,7 +116,7 @@ exports.deleteMenuItem = async (req, res) => {
   try {
     const menuItem = await MenuItem.findOneAndDelete({
       _id: req.params.id,
-      restaurantId: req.params.restaurantId,
+      restaurantId: req.params.restaurantId
     });
     if (!menuItem) {
       return res.status(404).json({ message: "Menu item not found" });
@@ -152,14 +156,17 @@ exports.getUniqueCategories = async (req, res) => {
   } catch (error) {
     res
       .status(500)
-      .json({ message: "Failed to fetch unique categories", error: error.message });
+      .json({
+        message: "Failed to fetch unique categories",
+        error: error.message
+      });
   }
 };
 
 // ✅ Get unique tags from all menu items
 exports.getUniqueTags = async (req, res) => {
   try {
-    const tags = await MenuItem.distinct('tags');
+    const tags = await MenuItem.distinct("tags");
     res.status(200).json(tags);
   } catch (error) {
     res
