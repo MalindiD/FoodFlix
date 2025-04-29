@@ -8,7 +8,7 @@ const AdminRestaurantsPage = () => {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
 
-  // ✅ Define fetchRestaurants at the top
+  //  Define fetchRestaurants at the top
   const fetchRestaurants = async () => {
     try {
       const token = sessionStorage.getItem("token");
@@ -27,7 +27,7 @@ const AdminRestaurantsPage = () => {
   };
 
   useEffect(() => {
-    fetchRestaurants(); // ✅ Call it inside useEffect
+    fetchRestaurants(); //  Call it inside useEffect
   }, []);
 
   const handleToggleVerify = async (restaurantId) => {
@@ -40,7 +40,7 @@ const AdminRestaurantsPage = () => {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
-      fetchRestaurants(); // ✅ Now no error!
+      fetchRestaurants(); //  Now no error!
     } catch (err) {
       console.error("Failed to toggle verification", err);
     }
@@ -150,7 +150,6 @@ const AdminRestaurantsPage = () => {
 
                     {/* Action Buttons */}
                     <td className="p-4 flex flex-col md:flex-row gap-2">
-                      {/* Verify / Unverify Button */}
                       <button
                         onClick={() => handleToggleVerify(restaurant._id)}
                         className="text-xs px-3 py-2 rounded bg-indigo-500 text-white hover:bg-indigo-600 transition"
@@ -158,7 +157,6 @@ const AdminRestaurantsPage = () => {
                         {restaurant.isVerified ? "Unverify" : "Verify"}
                       </button>
 
-                      {/* View Orders Button */}
                       <Link
                         to={`/admin/restaurants/${restaurant._id}/orders`}
                         className="text-xs px-3 py-2 rounded bg-green-500 text-white hover:bg-green-600 text-center"

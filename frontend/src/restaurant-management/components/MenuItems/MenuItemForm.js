@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { menuItemService } from "../../services/menuItemService";
 import axios from "axios";
 
-// ... (imports)
 function MenuItemForm({ existingMenuItem = null, onClose, onSubmitSuccess }) {
   const storedRestaurant = sessionStorage.getItem("restaurant");
   const restaurantId = storedRestaurant

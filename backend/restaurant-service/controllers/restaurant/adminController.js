@@ -2,7 +2,7 @@ const User = require("../../models/restaurant/User");
 const Payment = require("../../models/restaurant/Payment");
 const Restaurant = require("../../models/restaurant/Restaurant");
 
-// Get all users (optional role filter)
+// get all users
 exports.getAllUsers = async (req, res) => {
   try {
     const { role } = req.query;
@@ -15,7 +15,7 @@ exports.getAllUsers = async (req, res) => {
       .json({ message: "Failed to fetch users", error: error.message });
   }
 };
-//deactivate user by admin
+//deactivate user by admn
 exports.deactivateUser = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -50,7 +50,7 @@ exports.getAllRestaurants = async (req, res) => {
       .json({ message: "Failed to fetch restaurants", error: error.message });
   }
 };
-//toggle Restaurant Verification
+//toggle Restaurant Veriffication
 exports.toggleRestaurantVerification = async (req, res) => {
   try {
     const { restaurantId } = req.params;
@@ -75,7 +75,7 @@ exports.toggleRestaurantVerification = async (req, res) => {
   }
 };
 
-// Toggle verification for delivery/restaurant users
+// togggle verification for delivery and restaurant
 exports.updateVerification = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -98,7 +98,7 @@ exports.updateVerification = async (req, res) => {
   }
 };
 
-// Get all payments (optional filter by status)
+// get all payments
 exports.getAllPayments = async (req, res) => {
   try {
     const { status } = req.query;
@@ -112,7 +112,7 @@ exports.getAllPayments = async (req, res) => {
   }
 };
 
-// Get summary of payments
+// get summary of payments
 exports.getPaymentSummary = async (req, res) => {
   try {
     const summary = await Payment.aggregate([

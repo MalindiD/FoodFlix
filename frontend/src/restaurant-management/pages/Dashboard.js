@@ -4,7 +4,7 @@ import renderOrdersTable from "../components/orders/renderOrdersTable";
 import OrderDetailsModal from "../components/orders/OrderDetailsModal";
 import RestaurantLayout from "../components/Layout/RestaurantLayout";
 import axios from "axios";
-import { FaClock, FaTools, FaBoxOpen } from "react-icons/fa"; // ✅ Import icons
+import { FaClock, FaTools, FaBoxOpen } from "react-icons/fa";
 
 function Dashboard() {
   const [orders, setOrders] = useState([]);

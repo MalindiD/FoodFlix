@@ -37,7 +37,7 @@ mongoose
     console.error("Full Error Details:", JSON.stringify(err, null, 2));
   });
 
-// ✅ Auth routes
+// Auth routes
 const restaurantAuthRoutes = require("./routes/restaurant/authRoutes");
 app.use("/api/auth", restaurantAuthRoutes);
 
@@ -47,7 +47,7 @@ app.get("/api/auth/ping", (req, res) => {
 console.log("/api/auth route mounted");
 console.log(" Server is running on port", process.env.PORT || 5000);
 
-// ✅ Restaurant core functionality
+// Restaurant core functionality
 const restaurantRoutes = require("./routes/restaurant/restaurantRoutes");
 const menuItemRoutes = require("./routes/restaurant/menuItemRoutes");
 const orderRoutes = require("./routes/restaurant/orderRoutes");

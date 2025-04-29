@@ -60,7 +60,7 @@ const AdminCustomersPage = () => {
       <div className="p-6">
         <h1 className="text-3xl font-bold mb-6">Manage Customers</h1>
 
-        {/* 🧾 Summary Cards */}
+        {/* Summary Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
           <div className="bg-blue-100 text-blue-900 px-4 py-3 rounded shadow-md text-center">
             <p className="text-sm font-semibold">Total Customers</p>
@@ -80,7 +80,7 @@ const AdminCustomersPage = () => {
           </div>
         </div>
 
-        {/* 🔍 Filter */}
+        {/* Filter */}
         <div className="mb-6 flex items-center gap-2">
           <label className="font-medium">Filter by status:</label>
           <select
@@ -93,7 +93,7 @@ const AdminCustomersPage = () => {
           </select>
         </div>
 
-        {/* 📋 Customers Table */}
+        {/* Customers Table */}
         {loading ? (
           <p>Loading...</p>
         ) : filteredCustomers.length === 0 ? (

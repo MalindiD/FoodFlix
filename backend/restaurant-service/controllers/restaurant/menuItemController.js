@@ -37,7 +37,7 @@ exports.createMenuItem = async (req, res) => {
   const imageFromFile = req.file ? req.file.path : "";
   const imageFromUrl = req.body.imageUrl || "";
 
-  // ✅ Parse tags field
+  // Parse tags field
   let parsedTags = [];
   try {
     if (typeof req.body.tags === "string") {
@@ -55,7 +55,7 @@ exports.createMenuItem = async (req, res) => {
       ...req.body,
       restaurantId: req.params.restaurantId,
       image: imageFromFile || imageFromUrl,
-      tags: parsedTags // ✅ use parsed tags array
+      tags: parsedTags // use parsed tags array
     });
     await menuItem.save();
     res.status(201).json(menuItem);
@@ -75,7 +75,7 @@ exports.updateMenuItem = async (req, res) => {
   const existingImage = req.body.existingImage || "";
   const finalImage = imageFromFile || imageFromUrl || existingImage;
 
-  // ✅ Parse tags field
+  // Parse tags field
   let parsedTags = [];
   try {
     if (typeof req.body.tags === "string") {
@@ -94,7 +94,7 @@ exports.updateMenuItem = async (req, res) => {
       {
         ...req.body,
         image: finalImage,
-        tags: parsedTags // ✅ use parsed tags array
+        tags: parsedTags // use parsed tags array
       },
       { new: true }
     );

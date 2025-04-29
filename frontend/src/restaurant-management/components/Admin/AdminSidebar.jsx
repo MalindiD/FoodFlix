@@ -1,9 +1,9 @@
 import React from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom"; // ✅ import useNavigate
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const AdminSidebar = () => {
   const { pathname } = useLocation();
-  const navigate = useNavigate(); // ✅ create navigate instance
+  const navigate = useNavigate();
 
   const linkClass = (path) =>
     `block px-4 py-2 rounded hover:bg-orange-100 ${
@@ -11,8 +11,8 @@ const AdminSidebar = () => {
     }`;
 
   const handleLogout = () => {
-    sessionStorage.removeItem("token"); // ✅ clear token
-    navigate("/restaurant-management/login"); // ✅ redirect to login page
+    sessionStorage.removeItem("token");
+    navigate("/restaurant-management/login");
   };
 
   return (

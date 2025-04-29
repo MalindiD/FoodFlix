@@ -117,7 +117,6 @@ const RestaurantRegister = () => {
 
       {message && <p className="mt-3 text-center text-sm">{message}</p>}
 
-      {/* 👇 Add Login Link */}
       <p className="mt-4 text-center text-sm">
         Already have an account?{" "}
         <Link

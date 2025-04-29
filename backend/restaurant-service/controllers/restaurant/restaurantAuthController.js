@@ -92,7 +92,7 @@ exports.loginRestaurant = async (req, res) => {
     if (email === "admin@foodflix.com" && password === "admin123") {
       return res.status(200).json({
         message: "Admin login successful",
-        token: generateToken("admin", "admin"), // You can add role if needed
+        token: generateToken("admin", "admin"),
         restaurant: {
           id: "admin",
           name: "Admin",

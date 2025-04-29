@@ -58,7 +58,7 @@ const AdminDeliveriesPage = () => {
       <div className="p-6">
         <h1 className="text-3xl font-bold mb-6">Manage Delivery Personnel</h1>
 
-        {/* 🔍 Filter Dropdown */}
+        {/* Filter Dropdown */}
         <div className="mb-6 flex items-center gap-2">
           <label className="font-medium">Filter:</label>
           <select
@@ -71,7 +71,7 @@ const AdminDeliveriesPage = () => {
           </select>
         </div>
 
-        {/* 📦 Data Table */}
+        {/* Data Table */}
         {loading ? (
           <p>Loading...</p>
         ) : filteredDeliveryUsers.length === 0 ? (

@@ -28,5 +28,4 @@ const authorize = (...roles) => {
   };
 };
 
-// ✅ Export BOTH correctly
 module.exports = { protect, authorize };

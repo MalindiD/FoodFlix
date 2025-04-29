@@ -28,7 +28,7 @@ exports.createOrder = async (req, res) => {
     await newOrder.save();
     res.status(201).json(newOrder);
   } catch (error) {
-    console.error("❌ Error creating order:", error);
+    console.error("Error creating order:", error);
     res
       .status(400)
       .json({ message: "Error creating order", error: error.message });
@@ -47,9 +47,6 @@ exports.getOrderById = async (req, res) => {
       query.restaurantId = restaurantId;
     }
 
-    // const order = await CustomerOrder.findOne(query)
-    //   .populate("restaurantId", "name")
-    //   .populate("items.menuItemId", "name");
     const order = await CustomerOrder.findOne(query).populate(
       "items.menuItemId",
       "name"
@@ -70,7 +67,7 @@ exports.getOrderById = async (req, res) => {
 
 // Update order status (for restaurant)
 exports.updateOrderStatus = async (req, res) => {
-  console.log("📦 PATCH hit with:", req.params, req.body);
+  console.log("PATCH hit with:", req.params, req.body);
 
   try {
     const { orderId } = req.params;
@@ -95,7 +92,7 @@ exports.updateOrderStatus = async (req, res) => {
 
     const query = { _id: orderId };
     if (restaurantId) {
-      query.restaurantId = restaurantId; // ✅ keep as String
+      query.restaurantId = restaurantId;
     }
 
     const order = await CustomerOrder.findOneAndUpdate(

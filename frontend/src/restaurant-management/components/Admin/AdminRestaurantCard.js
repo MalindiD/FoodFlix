@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 const AdminRestaurantCard = ({
   restaurant,
   onToggleAvailability,
-  onVerify // ✅ new prop
+  onVerify
 }) => {
   const {
     _id,
@@ -14,7 +14,7 @@ const AdminRestaurantCard = ({
     contactNumber,
     isAvailable,
     profileImage,
-    isVerified // ✅ verification flag
+    isVerified
   } = restaurant;
 
   return (
@@ -42,13 +42,13 @@ const AdminRestaurantCard = ({
       <p>
         Status:{" "}
         <span className="ml-1">
-          {isAvailable ? "✅ Available" : "❌ Unavailable"}
+          {isAvailable ? " Available" : " Unavailable"}
         </span>
       </p>
       <p>
         Verification:{" "}
         <span className="ml-1">
-          {isVerified ? "✅ Verified" : "❌ Not Verified"}
+          {isVerified ? " Verified" : " Not Verified"}
         </span>
       </p>
 
