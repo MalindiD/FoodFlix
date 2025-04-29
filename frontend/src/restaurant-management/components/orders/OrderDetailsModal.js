@@ -24,7 +24,7 @@ export default function OrderDetailsModal({ order, onClose }) {
           ×
         </button>
 
-        <h2 className="text-xl font-bold mb-4">🧾 Order Details</h2>
+        <h2 className="text-xl font-bold mb-4">Order Details</h2>
 
         <div className="mb-4 space-y-1 text-sm">
           <p>
@@ -44,7 +44,7 @@ export default function OrderDetailsModal({ order, onClose }) {
         </div>
 
         <div className="mb-4">
-          <h3 className="font-semibold mb-2">📦 Items</h3>
+          <h3 className="font-semibold mb-2">Items</h3>
           <ul className="space-y-3 text-sm">
             {order.items?.map((item, index) => (
               <li key={index} className="border-b pb-2">
@@ -52,20 +52,20 @@ export default function OrderDetailsModal({ order, onClose }) {
                   <strong>{item.name || "Unnamed Item"}</strong>
                 </div>
                 <div>Quantity: {item.quantity || 0}</div>
-                <div>Price: ${item.price?.toFixed(2) || "0.00"}</div>
-                <div>Subtotal: ${calculateSubtotal(item).toFixed(2)}</div>
+                <div>Price: Rs.{item.price?.toFixed(2) || "0.00"}</div>
+                <div>Subtotal: Rs.{calculateSubtotal(item).toFixed(2)}</div>
               </li>
             ))}
           </ul>
         </div>
 
         <div className="text-right text-base font-bold">
-          Total: ${order.totalPrice?.toFixed(2) || "0.00"}
+          Total: Rs.{order.totalPrice?.toFixed(2) || "0.00"}
         </div>
 
         {order.statusHistory?.length > 0 && (
           <div className="mt-6">
-            <h3 className="font-semibold mb-2 text-sm">📜 Status History</h3>
+            <h3 className="font-semibold mb-2 text-sm">Status History</h3>
             <ul className="text-xs text-gray-700 space-y-1">
               {order.statusHistory.map((entry, idx) => (
                 <li key={idx}>

@@ -41,10 +41,10 @@ import AdminDeliveriesPage from "./restaurant-management/pages/AdminDeliveriesPa
 import AdminRestaurantsPage from "./restaurant-management/pages/AdminRestaurantsPage";
 import AdminMenuPage from "./restaurant-management/pages/AdminMenuPage";
 import AdminOrdersPage from "./restaurant-management/pages/AdminOrdersPage";
+
 import AdminFinancialsPage from "./restaurant-management/pages/AdminFinancialsPage";
 
-// Payment
-// import PaymentPage from "./pages/PaymentPage";
+import PaymentPage from "./pages/PaymentPage";
 
 function App() {
   const { user } = useContext(AuthContext);
@@ -83,6 +83,10 @@ function App() {
 
           {/* Restaurant Management (Restaurant Role) */}
           <Route
+            path="/"
+            element={<Navigate to="/restaurant-management/login" replace />}
+          />
+          <Route
             path="/restaurant-management/login"
             element={<RestaurantLogin />}
           />
@@ -99,6 +103,23 @@ function App() {
             element={<RestaurantsPage />}
           />
           <Route
+            path="/admin/restaurants/:id/menu"
+            element={<AdminMenuPage />}
+          />
+          <Route
+            path="/admin/restaurants/:id/orders"
+            element={<AdminOrdersPage />}
+          />
+
+          <Route
+            path="/restaurant-management/handle-payments"
+            element={<HandlePayments />}
+          />
+          <Route
+            path="/restaurant-management/order-history"
+            element={<OrderHistory />}
+          />
+          <Route
             path="/restaurant-management/menu-items"
             element={<MenuItemsPage />}
           />
@@ -110,6 +131,20 @@ function App() {
             path="/restaurant-management/order-history"
             element={<OrderHistory />}
           />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route
+            path="/admin/manage-customers"
+            element={<AdminCustomersPage />}
+          />
+          <Route
+            path="/admin/manage-deliveries"
+            element={<AdminDeliveriesPage />}
+          />
+          <Route
+            path="/admin/manage-restaurants"
+            element={<AdminRestaurantsPage />}
+          />
+          <Route path="/admin/financials" element={<AdminFinancialsPage />} />
 
           {/* Admin Management */}
           <Route path="/admin/dashboard" element={<AdminDashboard />} />

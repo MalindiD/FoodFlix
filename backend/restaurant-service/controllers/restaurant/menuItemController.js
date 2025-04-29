@@ -66,7 +66,7 @@ exports.createMenuItem = async (req, res) => {
   }
 };
 
-// ✅ Update menu item (with tag parsing)
+// Update menu item
 exports.updateMenuItem = async (req, res) => {
   const { id } = req.params;
 
