@@ -78,9 +78,11 @@ exports.updateOrderStatus = async (req, res) => {
       "Pending",
       "Confirmed",
       "Preparing",
+      "Ready",
       "Cooking",
       "Out for Delivery",
       "Delivered",
+      "Completed",
       "Cancelled"
     ];
 
