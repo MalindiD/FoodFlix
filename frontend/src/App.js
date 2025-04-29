@@ -1,10 +1,5 @@
 import React, { useContext } from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate
-} from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 // Context
 import AuthContext from "./context/AuthContext";
@@ -41,179 +36,114 @@ import AdminDeliveriesPage from "./restaurant-management/pages/AdminDeliveriesPa
 import AdminRestaurantsPage from "./restaurant-management/pages/AdminRestaurantsPage";
 import AdminMenuPage from "./restaurant-management/pages/AdminMenuPage";
 import AdminOrdersPage from "./restaurant-management/pages/AdminOrdersPage";
-
 import AdminFinancialsPage from "./restaurant-management/pages/AdminFinancialsPage";
+
+// Delivery Partner Pages
+import LoginPartner from './delivery_service/pages/loginPartner';
+import PartnerDashboard from './delivery_service/pages/PartnerDashboard';
+import MockDriver from './delivery_service/pages/MockDriver';
+import PartnerForm from './delivery_service/pages/RegisterPartner';
 
 function App() {
   const { user } = useContext(AuthContext);
 
+  // Helper for role-based redirects
+  const getDashboardPath = (role) => {
+    switch (role) {
+      case "customer":
+        return "/dashboard";
+      case "delivery":
+        return "/partner-dashboard";
+      case "restaurant":
+        return "/restaurant-management/dashboard";
+      case "admin":
+        return "/admin/dashboard";
+      default:
+        return "/";
+    }
+  };
+
   return (
     <>
-      {user?.role === "customer" ? (
+      {user?.role === "customer" && (
         <CartProvider>
           <CartPopup />
-          <Routes>
-            {/* Customer Role Routes */}
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+        </CartProvider>
+      )}
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/restaurant/:id" element={<RestaurantDetail />} />
+        <Route path="/track/:orderId" element={<OrderTracking />} />
+
+        {/* Customer Role Routes */}
+        {user?.role === "customer" && (
+          <>
             <Route path="/dashboard" element={<CustomerDashboard />} />
-            <Route path="/restaurant/:id" element={<RestaurantDetail />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="/order-success" element={<OrderSuccess />} />
             <Route path="/delivery-details" element={<DeliveryDetailsPage />} />
             <Route path="/orders" element={<CustomerOrders />} />
-            <Route path="/track/:orderId" element={<OrderTracking />} />
-            {/* <Route path="/payment" element={<PaymentPage />} /> */}
             <Route path="*" element={<Navigate to="/dashboard" />} />
-          </Routes>
-        </CartProvider>
-      ) : (
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/restaurant/:id" element={<RestaurantDetail />} />
-          <Route path="/track/:orderId" element={<OrderTracking />} />
+          </>
+        )}
 
-          {/* Restaurant Management (Restaurant Role) */}
-          <Route
-            path="/"
-            element={<Navigate to="/restaurant-management/login" replace />}
-          />
-          <Route
-            path="/restaurant-management/login"
-            element={<RestaurantLogin />}
-          />
-          <Route
-            path="/restaurant-management/register"
-            element={<RestaurantRegister />}
-          />
-          <Route
-            path="/restaurant-management/dashboard"
-            element={<RestaurantManagementDashboard />}
-          />
-          <Route
-            path="/restaurant-management/restaurants"
-            element={<RestaurantsPage />}
-          />
-          <Route
-            path="/admin/restaurants/:id/menu"
-            element={<AdminMenuPage />}
-          />
-          <Route
-            path="/admin/restaurants/:id/orders"
-            element={<AdminOrdersPage />}
-          />
+        {/* Delivery Partner Routes */}
+        {user?.role === "delivery" && (
+          <>
+            <Route path="/login-partner" element={<LoginPartner />} />
+            <Route path="/partner-dashboard" element={<PartnerDashboard />} />
+            <Route path="/mock-driver/:orderId/:lat/:lng" element={<MockDriver />} />
+            <Route path="/register-partner" element={<PartnerForm />} />
+            <Route path="*" element={<Navigate to="/partner-dashboard" />} />
+          </>
+        )}
 
-          <Route
-            path="/restaurant-management/handle-payments"
-            element={<HandlePayments />}
-          />
-          <Route
-            path="/restaurant-management/order-history"
-            element={<OrderHistory />}
-          />
-          <Route
-            path="/restaurant-management/menu-items"
-            element={<MenuItemsPage />}
-          />
-          <Route
-            path="/restaurant-management/handle-payments"
-            element={<HandlePayments />}
-          />
-          <Route
-            path="/restaurant-management/order-history"
-            element={<OrderHistory />}
-          />
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          <Route
-            path="/admin/manage-customers"
-            element={<AdminCustomersPage />}
-          />
-          <Route
-            path="/admin/manage-deliveries"
-            element={<AdminDeliveriesPage />}
-          />
-          <Route
-            path="/admin/manage-restaurants"
-            element={<AdminRestaurantsPage />}
-          />
-          <Route path="/admin/financials" element={<AdminFinancialsPage />} />
+        {/* Restaurant Role Routes */}
+        {user?.role === "restaurant" && (
+          <>
+            <Route path="/restaurant-management/login" element={<RestaurantLogin />} />
+            <Route path="/restaurant-management/register" element={<RestaurantRegister />} />
+            <Route path="/restaurant-management/dashboard" element={<RestaurantManagementDashboard />} />
+            <Route path="/restaurant-management/restaurants" element={<RestaurantsPage />} />
+            <Route path="/restaurant-management/menu-items" element={<MenuItemsPage />} />
+            <Route path="/restaurant-management/handle-payments" element={<HandlePayments />} />
+            <Route path="/restaurant-management/order-history" element={<OrderHistory />} />
+            <Route path="*" element={<Navigate to="/restaurant-management/dashboard" />} />
+          </>
+        )}
 
-          {/* Admin Management */}
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          <Route
-            path="/admin/manage-customers"
-            element={<AdminCustomersPage />}
-          />
-          <Route
-            path="/admin/manage-deliveries"
-            element={<AdminDeliveriesPage />}
-          />
-          <Route
-            path="/admin/manage-restaurants"
-            element={<AdminRestaurantsPage />}
-          />
-          <Route
-            path="/admin/restaurants/:id/menu"
-            element={<AdminMenuPage />}
-          />
-          <Route
-            path="/admin/restaurants/:id/orders"
-            element={<AdminOrdersPage />}
-          />
-          <Route path="/admin/financials" element={<AdminFinancialsPage />} />
+        {/* Admin Role Routes */}
+        {user?.role === "admin" && (
+          <>
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/manage-customers" element={<AdminCustomersPage />} />
+            <Route path="/admin/manage-deliveries" element={<AdminDeliveriesPage />} />
+            <Route path="/admin/manage-restaurants" element={<AdminRestaurantsPage />} />
+            <Route path="/admin/restaurants/:id/menu" element={<AdminMenuPage />} />
+            <Route path="/admin/restaurants/:id/orders" element={<AdminOrdersPage />} />
+            <Route path="/admin/financials" element={<AdminFinancialsPage />} />
+            <Route path="*" element={<Navigate to="/admin/dashboard" />} />
+          </>
+        )}
 
-          {/* Payment Route */}
-          {/* <Route path="/payment" element={<PaymentPage />} /> */}
-
-          {/* Role-Based Redirects */}
-          {user?.role === "delivery" && (
-            <Route
-              path="/delivery-dashboard"
-              element={<Navigate to="/dashboard" />}
-            />
-          )}
-          {user?.role === "restaurant" && (
-            <Route
-              path="/restaurant-dashboard"
-              element={<Navigate to="/restaurant-management/dashboard" />}
-            />
-          )}
-          {user?.role === "admin" && (
-            <Route path="/admin" element={<Navigate to="/admin/dashboard" />} />
-          )}
-
-          {/* Catch-all */}
-          <Route
-            path="*"
-            element={
-              user ? (
-                <Navigate
-                  to={
-                    user.role === "customer"
-                      ? "/dashboard"
-                      : user.role === "delivery"
-                      ? "/delivery-dashboard"
-                      : user.role === "restaurant"
-                      ? "/restaurant-management/dashboard"
-                      : user.role === "admin"
-                      ? "/admin/dashboard"
-                      : "/"
-                  }
-                />
-              ) : (
-                <Navigate to="/" />
-              )
-            }
-          />
-        </Routes>
-      )}
-      </>
+        {/* Catch-all for unknown users or roles */}
+        <Route
+          path="*"
+          element={
+            user ? (
+              <Navigate to={getDashboardPath(user.role)} />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+      </Routes>
+    </>
   );
 }
 

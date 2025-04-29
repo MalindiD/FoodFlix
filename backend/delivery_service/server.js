@@ -13,19 +13,26 @@ dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
+// ✅ Also configure Socket.IO CORS properly
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:5173',
-    methods: ['GET', 'POST']
-  }
+    origin: ["http://localhost:3001", "http://localhost:5173"],
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
 });
 
 app.set('io', io);
 connectDB();
 
 app.use(express.json());
-app.use(cors());
+// ✅ Allow BOTH frontend origins
+app.use(cors({
+  origin: ["http://localhost:3001", "http://localhost:5173"],
+  credentials: true,
+}));
 app.use(morgan('dev'));
+// Correct the route if necessary
 app.use('/api/partners', partnerRoutes);
 app.use('/api/delivery', deliveryRoutes);
 app.use('/api/location', locationRoutes);

@@ -21,10 +21,10 @@ const CheckoutPage = () => {
   const orderTotal = Number(localStorage.getItem('orderTotal')) || 0;
   const location = localStorage.getItem('userLocation') || '';
   const deliveryInstructions = localStorage.getItem('deliveryInstructions') || '';
-  const { cart,clearCart } = useCart();
+  const { cart, clearCart } = useCart();
 
-  const deliveryCoords = JSON.parse(localStorage.getItem('userLocationCoords')) 
-  
+  const deliveryCoords = JSON.parse(localStorage.getItem('userLocationCoords') || '{}');
+
   const [zipCode, setZipCode] = useState('');
 
   const cardStyle = {
@@ -48,7 +48,10 @@ const CheckoutPage = () => {
     setErrorMsg('');
     setSuccessMsg('');
 
-    if (!stripe || !elements) return;
+    if (!stripe || !elements) {
+      setLoading(false);
+      return;
+    }
 
     const token = localStorage.getItem('token');
     if (!token) {
@@ -56,94 +59,92 @@ const CheckoutPage = () => {
       setLoading(false);
       return;
     }
-    console.log("Delivery Coordinates:", 
-      localStorage.getItem('userLocationCoords'));
-    console.log("Parsed Coordinates:", 
-      JSON.parse(localStorage.getItem('userLocationCoords')));
 
-      
-      if (!deliveryCoords || !deliveryCoords.lat || !deliveryCoords.lng) {
-        setErrorMsg("Please select a delivery location");
-        setLoading(false);
-        return;
-      }
-        try {
-          // 1. Create the order first
-          const orderRes = await axios.post(
-            'http://localhost:4000/api/orders',
-            {
-              restaurantId: cart[0]?.restaurantId,
-              items: cart.map(item => ({
-                menuItemId: item.id,
-                name: item.name,
-                price: item.price,
-                quantity: item.quantity
-              })),
-              totalPrice: orderTotal,
-              deliveryAddress: deliveryCoords
-            },
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json'
-              }
-            }
-          );
-      
-          const orderId = orderRes.data._id; // Get the new order's ID
-      
-          // 2. Now process the payment using the orderId from above
-          await axios.get('http://localhost:3002/api/payments/health', {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-      
-          const paymentRes = await axios.post(
-            'http://localhost:3002/api/payments/process',
-            {
-              orderId: orderId, // Use the ID from the order you just created
-              paymentMethod: 'stripe',
-              amount: orderTotal,
-              currency: 'LKR',
-              customerName: localStorage.getItem('userName') || 'Customer',
-              customerEmail: localStorage.getItem('userEmail') || 'customer@example.com',
-            },
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json',
-              },
-            }
-          );
-      
-          const { clientSecret } = paymentRes.data.data;
-      
-          const result = await stripe.confirmCardPayment(clientSecret, {
-            payment_method: {
-              card: elements.getElement(CardNumberElement),
-              billing_details: {
-                address: {
-                  postal_code: zipCode,
-                },
-              },
-            },
-          });
-      
-          if (result.error) {
-            setErrorMsg(result.error.message);
-          } else if (result.paymentIntent.status === 'succeeded') {
-            setSuccessMsg('✅ Payment successful!');
-            clearCart();
-          }
-        } catch (error) {
-          if (error.response) {
-            setErrorMsg(error.response.data?.error || `Error ${error.response.status}`);
-          } else {
-            setErrorMsg('Connection error: ' + error.message);
+    if (!deliveryCoords || !deliveryCoords.lat || !deliveryCoords.lng) {
+      setErrorMsg("Please select a delivery location");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      // 1. Create the order first
+      const orderRes = await axios.post(
+        'http://localhost:4000/api/orders',
+        {
+          restaurantId: cart[0]?.restaurantId,
+          items: cart.map(item => ({
+            menuItemId: item.id,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity
+          })),
+          totalPrice: orderTotal,
+          deliveryAddress: deliveryCoords
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
           }
         }
-      
-        setLoading(false);
-      };
+      );
+
+      const orderId = orderRes.data._id; // Get the new order's ID
+      sessionStorage.setItem('orderId', orderId); // Save it in sessionStorage
+
+      // 2. Now process the payment using the orderId from above
+      await axios.get('http://localhost:3002/api/payments/health', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const paymentRes = await axios.post(
+        'http://localhost:3002/api/payments/process',
+        {
+          orderId: orderId,
+          paymentMethod: 'stripe',
+          amount: orderTotal,
+          currency: 'LKR',
+          customerName: localStorage.getItem('userName') || 'Customer',
+          customerEmail: localStorage.getItem('userEmail') || 'customer@example.com',
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      const { clientSecret } = paymentRes.data.data;
+
+      const result = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+          card: elements.getElement(CardNumberElement),
+          billing_details: {
+            address: {
+              postal_code: zipCode,
+            },
+          },
+        },
+      });
+
+      if (result.error) {
+        setErrorMsg(result.error.message);
+      } else if (result.paymentIntent.status === 'succeeded') {
+        setSuccessMsg('✅ Payment successful!');
+        clearCart();
+        navigate('/payment-success');
+      }
+    } catch (error) {
+      if (error.response) {
+        setErrorMsg(error.response.data?.error || `Error ${error.response.status}`);
+      } else {
+        setErrorMsg('Connection error: ' + error.message);
+      }
+    }
+
+    setLoading(false);
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
@@ -174,6 +175,7 @@ const CheckoutPage = () => {
               </div>
             </div>
           </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-700">ZIP Code</label>
             <input
@@ -186,7 +188,6 @@ const CheckoutPage = () => {
           </div>
 
           {errorMsg && <p className="text-red-500 text-sm">{errorMsg}</p>}
-
           {successMsg ? (
             <div className="text-center">
               <p className="text-green-500 text-sm mb-3">{successMsg}</p>

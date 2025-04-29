@@ -53,12 +53,16 @@ const menuItemRoutes = require("./routes/restaurant/menuItemRoutes");
 const orderRoutes = require("./routes/restaurant/orderRoutes");
 const paymentRoutes = require("./routes/restaurant/paymentRoutes");
 const adminRoutes = require("./routes/restaurant/adminRoutes");
+const locationRoutes = require("./routes/location");
+
 
 app.use("/api/restaurants", restaurantRoutes);
 app.use("/api/restaurants/:restaurantId/menu-items", menuItemRoutes);
 app.use("/api/restaurants/:restaurantId/orders", orderRoutes);
 app.use("/api/restaurants", paymentRoutes);
 app.use("/api/admin", adminRoutes);
+app.use(locationRoutes);
+
 // Error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
