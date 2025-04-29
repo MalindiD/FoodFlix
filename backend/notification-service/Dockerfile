@@ -1,14 +1,16 @@
-FROM node:18-alpine
+# Use Node.js LTS image
+FROM node:18
 
+# Set working directory inside container
 WORKDIR /app
 
-# Copy package.json and package-lock.json
+# Copy package.json and package-lock.json first
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install --production
+# Install all dependencies
+RUN npm install
 
-# Copy source code
+# Copy all source code
 COPY . .
 
 # Set environment variables

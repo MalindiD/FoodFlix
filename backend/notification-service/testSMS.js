@@ -15,7 +15,7 @@ client.messages
   .create({
     body: '🚀 Hello from FoodFlix via Twilio!',
     from: process.env.TWILIO_PHONE_NUMBER,  // Your Twilio number
-    to: '+94703201494'                      // Your verified number
+    to: '+94770758438'                      // Your verified number
   })
   .then(message => console.log('✅ SMS sent! SID:', message.sid))
   .catch(error => console.error('❌ Error:', error.message));

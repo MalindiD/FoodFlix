@@ -44,13 +44,11 @@ import AdminOrdersPage from "./restaurant-management/pages/AdminOrdersPage";
 
 import AdminFinancialsPage from "./restaurant-management/pages/AdminFinancialsPage";
 
-import PaymentPage from "./pages/PaymentPage";
-
 function App() {
   const { user } = useContext(AuthContext);
 
   return (
-    <Router>
+    <>
       {user?.role === "customer" ? (
         <CartProvider>
           <CartPopup />
@@ -215,7 +213,7 @@ function App() {
           />
         </Routes>
       )}
-    </Router>
+      </>
   );
 }
 
