@@ -1,4 +1,3 @@
-// routes/notification.js
 const express = require('express');
 const {
   sendNotification,
@@ -12,18 +11,7 @@ const { protect, authorize } = require('../middleware/auth');
 
 const router = express.Router();
 
-// Middleware to handle undefined controller methods
-const handleUndefinedMethod = (methodName) => {
-  return (req, res, next) => {
-    console.error(`Undefined method: ${methodName}`);
-    res.status(500).json({
-      success: false,
-      message: `Method ${methodName} is not implemented`
-    });
-  };
-};
-
-// Health check endpoint (no auth required)
+// Health check
 router.get('/health', (req, res) => {
   res.status(200).json({
     success: true,
@@ -32,42 +20,40 @@ router.get('/health', (req, res) => {
   });
 });
 
-// Protected routes with fallback handlers
-router.post('/', 
-  protect, 
-  sendNotification || handleUndefinedMethod('sendNotification')
-);
+// Generic notification (email/sms/both)
+router.post('/', protect, sendNotification);
 
-router.post('/order', 
-  protect, 
-  sendOrderNotification || handleUndefinedMethod('sendOrderNotification')
-);
+// Order-specific notification
+router.post('/order', protect, sendOrderNotification);
 
-router.post('/payment', 
-  protect, 
-  sendPaymentNotification || handleUndefinedMethod('sendPaymentNotification')
-);
+// Payment-specific notification
+router.post('/payment', protect, sendPaymentNotification);
 
-router.get('/user/:userId', 
-  protect, 
-  getUserNotifications || handleUndefinedMethod('getUserNotifications')
-);
+// Real-time delivery notification (NO AUTH for testing)
+router.post('/realtime', (req, res) => {
+  const { deliveryPartnerId, orderId } = req.body;
 
-// Admin only routes
-router.get('/', 
-  protect, 
-  authorize('admin'), 
-  getAllNotifications || handleUndefinedMethod('getAllNotifications')
-);
+  const io = req.app.get('io');
+  if (io && deliveryPartnerId && orderId) {
+    io.to(deliveryPartnerId).emit('orderAssigned', {
+      message: `🚚 You have been assigned to Order #${orderId}`,
+      orderId,
+    });
+    console.log(`📡 Real-time socket sent to ${deliveryPartnerId} for Order ${orderId}`);
+  } else {
+    console.warn('⚠️ Missing Socket.IO instance or required fields');
+  }
 
-// Catch-all error handler
-router.use((err, req, res, next) => {
-  console.error(err);
-  res.status(500).json({
-    success: false,
-    message: 'Internal server error',
-    error: err.message
+  res.status(200).json({
+    success: true,
+    message: 'Delivery partner notified in real-time'
   });
 });
+
+// User-specific notifications
+router.get('/user/:userId', protect, getUserNotifications);
+
+// Admin: view all
+router.get('/', protect, authorize('admin'), getAllNotifications);
 
 module.exports = router;
