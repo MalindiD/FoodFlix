@@ -24,7 +24,7 @@ spec:
             - name: MONGO_URI
               valueFrom:
                 secretKeyRef:
-                  name: mongodb-secret
+                  name: restaurant-secrets
                   key: MONGO_URI
             - name: DEBUG
               value: "true"

@@ -72,7 +72,11 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/restaurant/:id" element={<RestaurantDetail />} />
-      <Route path="/track/:orderId" element={<OrderTracking />} />
+      {/* <Route path="/track/:orderId" element={<OrderTracking />} /> */}
+       <Route path="/login-partner" element={<LoginPartner />} />
+      <Route path="/mock-driver/:orderId/:lat/:lng" element={<MockDriver />} />
+      <Route path="/order-tracking/:orderId" element={<OrderTracking />} />
+
 
 
         {/* Customer Role Routes */}
@@ -92,9 +96,9 @@ function App() {
         {/* Delivery Partner Routes */}
         {user?.role === "delivery" && (
           <>
-            <Route path="/login-partner" element={<LoginPartner />} />
+            {/* <Route path="/login-partner" element={<LoginPartner />} />
             <Route path="/partner-dashboard" element={<PartnerDashboard />} />
-            <Route path="/mock-driver/:orderId/:lat/:lng" element={<MockDriver />} />
+            <Route path="/mock-driver/:orderId/:lat/:lng" element={<MockDriver />} /> */}
             <Route path="/register-partner" element={<PartnerForm />} />
             <Route path="*" element={<Navigate to="/partner-dashboard" />} />
           </>
@@ -129,7 +133,7 @@ function App() {
         )}
 
         {/* Catch-all for unknown users or roles */}
-        <Route
+        {/* <Route
           path="*"
           element={
             user ? (
@@ -138,7 +142,7 @@ function App() {
               <Navigate to="/" />
             )
           }
-        />
+        /> */}
       </Routes>
       </CartProvider>
   );

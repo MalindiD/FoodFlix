@@ -5,8 +5,7 @@ metadata:
 spec:
   selector:
     app: notification-service
-  type: NodePort
+  type: ClusterIP
   ports:
     - port: 5004
       targetPort: 5004
-      nodePort: 30001

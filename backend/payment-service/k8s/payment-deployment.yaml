@@ -34,8 +34,8 @@ spec:
             - name: MONGO_URI
               valueFrom:
                 secretKeyRef:
-                  name: mongodb-secret
-                  key: mongo-uri
+                  name: payment-secrets
+                  key: MONGO_URI
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
@@ -49,12 +49,8 @@ spec:
               value: "http://notification-service:5004"
             - name: CLIENT_URL
               value: "http://frontend:3001"
-            - name: AUTH_SERVICE_URL
-              value: "http://payment-service:3000"
             - name: DELIVERY_SERVICE_URL
               value: "http://delivery-service:5003"
-            - name: API_URL
-              value: "http://payment-service:3002"
             - name: CORS_ALLOW_ORIGIN
               value: "*"
             # Stripe configuration

@@ -17,6 +17,49 @@ spec:
           image: malindid/notification-service:latest
           ports:
             - containerPort: 5004
-          envFrom:
-            - secretRef:
-                name: notification-secrets
+          env:
+            - name: PORT
+              value: "5004"
+            - name: MONGO_URI
+              valueFrom:
+                secretKeyRef:
+                  name: notification-secrets
+                  key: MONGO_URI
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: notification-secrets
+                  key: jwt-secret
+            - name: SENDGRID_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: notification-secrets
+                  key: SENDGRID_API_KEY
+            - name: EMAIL_FROM
+              valueFrom:
+                secretKeyRef:
+                  name: notification-secrets
+                  key: EMAIL_FROM
+            - name: TWILIO_ACCOUNT_SID
+              valueFrom:
+                secretKeyRef:
+                  name: notification-secrets
+                  key: TWILIO_ACCOUNT_SID
+            - name: TWILIO_AUTH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: notification-secrets
+                  key: TWILIO_AUTH_TOKEN
+            - name: TWILIO_PHONE_NUMBER
+              valueFrom:
+                secretKeyRef:
+                  name: notification-secrets
+                  key: TWILIO_PHONE_NUMBER
+            - name: AUTH_SERVICE_URL
+              value: http://auth-service:3000
+            - name: ORDER_SERVICE_URL
+              value: http://order-service:4000
+            - name: PAYMENT_SERVICE_URL
+              value: http://payment-service:3000
+            - name: CLIENT_URL
+              value: http://frontend:3000
