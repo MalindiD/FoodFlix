@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: delivery-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: delivery-service
+  template:
+    metadata:
+      labels:
+        app: delivery-service
+    spec:
+      containers:
+        - name: delivery-service
+          image: malindid/delivery-service:latest
+          ports:
+            - containerPort: 5003
+          env:
+            - name: MONGO_URI
+              valueFrom:
+                secretKeyRef:
+                  name: delivery-secrets
+                  key: MONGO_URI
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: delivery-secrets
+                  key: JWT_SECRET
+            - name: RESTAURANT_SERVICE_URL
+              value: "http://restaurant-service:5000"
+            - name: ORDER_SERVICE_URL
+              value: "http://order-service:4000"
+            - name: NOTIFICATION_SERVICE_URL
+              value: "http://notification-service:5004"
+            - name: AUTH_SERVICE_URL
+              value: "http://auth-service:3000"
+            - name: PAYMENT_SERVICE_URL
+              value: "http://payment-service:3002"
+          resources:
+            limits:
+              cpu: "0.5"
+              memory: "512Mi"
+            requests:
+              cpu: "0.2"
+              memory: "256Mi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5003
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5003
+            initialDelaySeconds: 5
+            periodSeconds: 5

@@ -20,6 +20,21 @@ router.get('/all', protect, authorize('delivery'), async (req, res) => {
   }
 });
 
+// ✅ Add this route for partner profile
+router.get('/me', protect, async (req, res) => {
+  try {
+    const partner = await DeliveryPartner.findById(req.user.id);
+
+    if (!partner) {
+      return res.status(404).json({ message: 'Partner not found' });
+    }
+
+    res.status(200).json(partner);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Update availability
 router.put('/:id/availability', protect, authorize('delivery'), partnerController.updateAvailability);
 

@@ -3,7 +3,7 @@ const Delivery = require('../models/Delivery');
 const { assignDeliveryPartner } = require('../services/assignmentService');
 
 const ORDER_SERVICE_URL = process.env.ORDER_SERVICE_URL || 'http://localhost:4000';
-const NOTIFICATION_SERVICE_URL = process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:5001';
+const NOTIFICATION_SERVICE_URL = process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:5004';
 
 // ✅ Assign a delivery partner and create delivery
 // ✅ Assign a delivery partner and create delivery

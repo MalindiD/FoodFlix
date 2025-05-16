@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 
 const RestaurantSchema = new mongoose.Schema({
-  // 🔁 Existing fields (untouched)
   name: {
     type: String,
     required: true,
@@ -33,7 +32,6 @@ const RestaurantSchema = new mongoose.Schema({
     default: Date.now
   },
 
-  // ✅ New fields for authentication
   email: {
     type: String,
     required: true,
@@ -45,14 +43,17 @@ const RestaurantSchema = new mongoose.Schema({
     required: true
   },
 
-  // ✅ New optional field for profile image upload
   profileImage: {
     type: String,
     default: ""
+  },
+  isVerified: {
+    type: Boolean,
+    default: false
   }
 });
 
-// 🔐 Password encryption before save
+//  Password encryption before save
 RestaurantSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
   const salt = await bcrypt.genSalt(10);
@@ -60,7 +61,7 @@ RestaurantSchema.pre("save", async function (next) {
   next();
 });
 
-// ✅ Compare raw password with hashed
+//  Compare raw password with hashed
 RestaurantSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };

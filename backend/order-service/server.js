@@ -5,6 +5,7 @@ const connectDB = require('./config/db');
 const config = require('./config/db');
 const { connectQueue, consumeFromQueue } = require('./utils/messageQueue');
 require('dotenv').config();
+const trackingRoutes = require('./routes/tracking-routes');
 
 
 // Connect to Database
@@ -19,6 +20,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/orders', require('./routes/order-routes'));
+app.use('/api/tracking', trackingRoutes);
 
 // Health check route
 app.get('/health', (req, res) => {
@@ -62,7 +64,7 @@ const setupMessageConsumers = async () => {
       
       if (type === 'DELIVERY_STATUS_UPDATED') {
         try {
-          const Order = require('./models/CustomerOrders'); // ✅ Fix this!
+          const Order = require('./models/CustomerOrder'); // ✅ Fix this!
           const order = await Order.findById(orderId);
           
           if (order) {

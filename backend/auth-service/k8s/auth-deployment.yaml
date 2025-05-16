@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: auth-service
-          image: nuwanifonseka/auth-service:latest
+          image: malindid/auth-service:latest
           ports:
             - containerPort: 3000
           env:
@@ -28,7 +28,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: mongodb-secret
-                  key: mongo-uri
+                  key: MONGO_URI
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:

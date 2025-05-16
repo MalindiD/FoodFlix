@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: restaurant-management-service
-          image: nuwanifonseka/restaurant-service:latest
+          image: malindid/restaurant-service:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 5000
@@ -24,7 +24,7 @@ spec:
             - name: MONGO_URI
               valueFrom:
                 secretKeyRef:
-                  name: mongodb-secret
+                  name: restaurant-secrets
                   key: MONGO_URI
             - name: DEBUG
               value: "true"
