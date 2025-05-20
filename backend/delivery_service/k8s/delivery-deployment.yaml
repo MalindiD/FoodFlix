@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: delivery-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: delivery
+  template:
+    metadata:
+      labels:
+        app: delivery
+    spec:
+      containers:
+        - name: delivery
+          image: tinykav/delivery-service:latest
+          ports:
+            - containerPort: 5003
+          env:
+            - name: MONGO_URI
+              valueFrom:
+                secretKeyRef:
+                  name: delivery-secrets
+                  key: MONGO_URI
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: delivery-secrets
+                  key: JWT_SECRET
